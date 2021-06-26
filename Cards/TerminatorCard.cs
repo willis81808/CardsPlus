@@ -45,12 +45,11 @@ namespace CardsPlusPlugin.Cards
         }
         protected override GameObject GetCardArt()
         {
-            var art = CardsPlus.ArtAssets.LoadAsset<GameObject>("C_Terminator");
-            return art;
+            return Assets.TerminatorArt;
         }
         protected override CardInfo.Rarity GetRarity()
         {
-            return CardInfo.Rarity.Common;
+            return CardInfo.Rarity.Uncommon;
         }
         protected override CardInfoStat[] GetStats()
         {

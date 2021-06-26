@@ -29,7 +29,7 @@ namespace CardsPlusPlugin.Cards
         
         protected override string GetTitle()
         {
-            return "The Turtle";
+            return "Turtle";
         }
         protected override string GetDescription()
         {
@@ -37,8 +37,7 @@ namespace CardsPlusPlugin.Cards
         }
         protected override GameObject GetCardArt()
         {
-            var art = CardsPlus.ArtAssets.LoadAsset<GameObject>("C_TheTurtle");
-            return art;
+            return Assets.TurtleArt;
         }
         protected override CardInfo.Rarity GetRarity()
         {

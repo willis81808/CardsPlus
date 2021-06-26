@@ -13,6 +13,7 @@ namespace CardsPlusPlugin.Cards
         public override void SetupCard(CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers)
         {
             statModifiers.gravity = 0.25f;
+            statModifiers.jump = 1.25f;
         }
 
         public override void OnAddCard(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)
@@ -37,7 +38,7 @@ namespace CardsPlusPlugin.Cards
 
         protected override GameObject GetCardArt()
         {
-            return null;
+            return Assets.LowGravityArt;
         }
 
         protected override CardInfo.Rarity GetRarity()
@@ -51,10 +52,17 @@ namespace CardsPlusPlugin.Cards
             {
                 new CardInfoStat()
                 {
-                    positive = false,
+                    positive = true,
                     amount = "-75%",
                     simepleAmount = CardInfoStat.SimpleAmount.aLotLower,
                     stat = "Gravity"
+                },
+                new CardInfoStat()
+                {
+                    positive = true,
+                    amount = "+25%",
+                    simepleAmount = CardInfoStat.SimpleAmount.aLittleBitOf,
+                    stat = "Jump height"
                 }
             };
         }

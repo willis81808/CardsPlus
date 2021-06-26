@@ -99,10 +99,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets.cs" />
     <Compile Include="CardsPlus.cs" />
     <Compile Include="Cards\FragmentCard.cs" />
     <Compile Include="Cards\HareCard.cs" />
-    <Compile Include="Cards\LaserCard.cs" />
     <Compile Include="Cards\LowGravityCard.cs" />
     <Compile Include="Cards\QuickReflexesCard.cs" />
     <Compile Include="Cards\SlowPokeCard.cs" />

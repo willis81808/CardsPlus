@@ -37,8 +37,7 @@ namespace CardsPlusPlugin.Cards
         }
         protected override GameObject GetCardArt()
         {
-            var art = CardsPlus.ArtAssets.LoadAsset<GameObject>("C_SlowPoke");
-            return art;
+            return Assets.SlowPokeArt;
         }
         protected override CardInfo.Rarity GetRarity()
         {

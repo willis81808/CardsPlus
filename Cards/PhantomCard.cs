@@ -14,7 +14,7 @@ namespace CardsPlusPlugin.Cards
         {
             var block = gameObject.AddComponent<Block>();
             block.InvokeMethod("ResetStats");
-            block.cdMultiplier = 1.5f;
+            block.cdAdd = 3f;
         }
         public override void OnAddCard(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)
         {
@@ -23,7 +23,7 @@ namespace CardsPlusPlugin.Cards
             {
                 effect = player.gameObject.AddComponent<PhantomEffect>();
             }
-            effect.AddDuration(1f);
+            effect.AddDuration(Math.Max(1f, effect.duration));
         }
         public override void OnRemoveCard()
         {
@@ -42,8 +42,7 @@ namespace CardsPlusPlugin.Cards
 
         protected override GameObject GetCardArt()
         {
-            var art = CardsPlus.ArtAssets.LoadAsset<GameObject>("C_Phantom");
-            return art;
+            return Assets.PhantomArt;
         }
 
         protected override CardInfo.Rarity GetRarity()
@@ -58,8 +57,8 @@ namespace CardsPlusPlugin.Cards
                 new CardInfoStat()
                 {
                     positive = false,
-                    amount = "+50%",
-                    simepleAmount = CardInfoStat.SimpleAmount.aLotOf,
+                    amount = "3s",
+                    simepleAmount = CardInfoStat.SimpleAmount.notAssigned,
                     stat = "Block cooldown"
                 }
             };
@@ -76,7 +75,9 @@ namespace CardsPlusPlugin.Cards
     {
         private Player player;
 
-        private float startTime = float.MaxValue, duration = 0;
+        private float startTime = float.MaxValue;
+
+        public float duration = 0f;
 
         private bool active = false;
 

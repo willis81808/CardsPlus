@@ -27,7 +27,7 @@ namespace CardsPlusPlugin.Cards
 
         protected override string GetTitle()
         {
-            return "The Hare";
+            return "Hare";
         }
         protected override string GetDescription()
         {
@@ -35,8 +35,7 @@ namespace CardsPlusPlugin.Cards
         }
         protected override GameObject GetCardArt()
         {
-            var art = CardsPlus.ArtAssets.LoadAsset<GameObject>("C_TheHare");
-            return art;
+            return Assets.HareArt;
         }
         protected override CardInfo.Rarity GetRarity()
         {

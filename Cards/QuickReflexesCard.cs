@@ -14,7 +14,10 @@ namespace CardsPlusPlugin.Cards
     {
         public override void SetupCard(CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers)
         {
-
+            cardInfo.allowMultiple = false;
+            var block = gameObject.AddComponent<Block>();
+            block.InvokeMethod("ResetStats");
+            block.cdAdd = 2f;
         }
         public override void OnAddCard(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)
         {
@@ -32,15 +35,24 @@ namespace CardsPlusPlugin.Cards
         }
         protected override GameObject GetCardArt()
         {
-            return null;
+            return Assets.QuickReflexesArt;
         }
         protected override CardInfo.Rarity GetRarity()
         {
-            return CardInfo.Rarity.Common;
+            return CardInfo.Rarity.Rare;
         }
         protected override CardInfoStat[] GetStats()
         {
-            return null;
+            return new CardInfoStat[]
+            {
+                new CardInfoStat()
+                {
+                    positive = false,
+                    amount = "2s",
+                    simepleAmount = CardInfoStat.SimpleAmount.notAssigned,
+                    stat = "Block cooldown"
+                }
+            };
         }
         protected override CardThemeColor.CardThemeColorType GetTheme()
         {
