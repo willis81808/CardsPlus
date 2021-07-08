@@ -54,6 +54,10 @@
     <Reference Include="PhotonUnityNetworking">
       <HintPath>A:\Program Files\SteamLibrary\steamapps\common\ROUNDS\Rounds_Data\Managed\PhotonUnityNetworking.dll</HintPath>
     </Reference>
+    <Reference Include="SonigonAudioEngine.Runtime, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>A:\Program Files\SteamLibrary\steamapps\common\ROUNDS\Rounds_Data\Managed\SonigonAudioEngine.Runtime.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -104,8 +108,10 @@
     <Compile Include="Cards\FragmentCard.cs" />
     <Compile Include="Cards\HareCard.cs" />
     <Compile Include="Cards\LowGravityCard.cs" />
+    <Compile Include="Cards\MentalistCard.cs" />
     <Compile Include="Cards\QuickReflexesCard.cs" />
     <Compile Include="Cards\SlowPokeCard.cs" />
+    <Compile Include="Cards\SnakeAttackCard.cs" />
     <Compile Include="Cards\TerminatorCard.cs" />
     <Compile Include="Cards\PhantomCard.cs" />
     <Compile Include="Cards\TurtleCard.cs" />

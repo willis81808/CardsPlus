@@ -35,6 +35,7 @@ namespace CardsPlusPlugin
             CustomCard.BuildCard<PhantomCard>();
             CustomCard.BuildCard<QuickReflexesCard>();
             CustomCard.BuildCard<LowGravityCard>();
+            CustomCard.BuildCard<SnakeAttackCard>();
         }
         
     }
