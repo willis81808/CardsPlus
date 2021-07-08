@@ -54,7 +54,7 @@ namespace CardsPlusPlugin.Cards
 
         protected override CardInfo.Rarity GetRarity()
         {
-            return CardInfo.Rarity.Common;
+            return CardInfo.Rarity.Uncommon;
         }
 
         protected override GameObject GetCardArt()
@@ -198,8 +198,8 @@ namespace CardsPlusPlugin.Cards
             {
                 RandomizeMovement();
                 FollowTarget();
-                RotateHead();
             }
+            RotateHead();
 
             // clamp max speed
             velocity = Vector2.ClampMagnitude(velocity, maxSpeed);

@@ -36,7 +36,8 @@ namespace CardsPlusPlugin
             //SnakePrefab.AddComponent<PhotonTransformView>().m_SynchronizePosition = true;
             //SnakePrefab.transform.GetChild(0).gameObject.AddComponent<PhotonTransformView>().m_SynchronizeRotation = true;
             var snakeView = SnakePrefab.GetComponent<PhotonView>();
-            snakeView.Synchronization = ViewSynchronization.ReliableDeltaCompressed;
+            snakeView.GetComponent<NetworkPhysicsObject>().sendFreq = 2;
+            snakeView.Synchronization = ViewSynchronization.UnreliableOnChange;
             snakeView.OwnershipTransfer = OwnershipOption.Takeover;
             snakeView.observableSearch = PhotonView.ObservableSearch.AutoFindAll;
         }
