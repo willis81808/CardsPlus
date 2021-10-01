@@ -12,10 +12,9 @@ namespace CardsPlusPlugin.Cards
 {
     public class QuickReflexesCard : CustomCard
     {
-        public override void SetupCard(CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers)
+        public override void SetupCard(CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers, Block block)
         {
             cardInfo.allowMultiple = false;
-            var block = gameObject.AddComponent<Block>();
             block.InvokeMethod("ResetStats");
             block.cdAdd = 2f;
         }

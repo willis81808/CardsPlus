@@ -11,10 +11,9 @@ namespace CardsPlusPlugin.Cards
 {
     public class TurtleCard : CustomCard
     {
-        public override void SetupCard(CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers)
+        public override void SetupCard(CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers, Block block)
         {
             statModifiers.movementSpeed = 0.70f;
-            var block = gameObject.AddComponent<Block>();
             block.InvokeMethod("ResetStats");
             block.cdMultiplier = 0.3f;
         }

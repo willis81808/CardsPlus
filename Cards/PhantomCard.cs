@@ -10,9 +10,8 @@ namespace CardsPlusPlugin.Cards
 {
     public class PhantomCard : CustomCard
     {
-        public override void SetupCard(CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers)
+        public override void SetupCard(CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers, Block block)
         {
-            var block = gameObject.AddComponent<Block>();
             block.InvokeMethod("ResetStats");
             block.cdAdd = 3f;
         }
