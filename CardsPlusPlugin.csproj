@@ -69,8 +69,8 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="UnboundLib, Version=2.4.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\UnboundLib.2.4.0\lib\net461\UnboundLib.dll</HintPath>
+    <Reference Include="UnboundLib, Version=2.7.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\UnboundLib.2.7.3\lib\net461\UnboundLib.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>A:\Program Files\SteamLibrary\steamapps\common\ROUNDS\Rounds_Data\Managed\UnityEngine.dll</HintPath>

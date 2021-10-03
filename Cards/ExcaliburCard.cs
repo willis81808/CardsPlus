@@ -40,9 +40,8 @@ namespace CardsPlusPlugin.Cards
             //throw new NotImplementedException();
         }
 
-        public override void SetupCard(CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers)
+        public override void SetupCard(CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers, Block block)
         {
-            var block = gameObject.AddComponent<Block>();
             block.InvokeMethod("ResetStats");
             block.cdMultiplier = 0.6f;
         }
