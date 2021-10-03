@@ -26,6 +26,11 @@ namespace CardsPlusPlugin.Cards
             //throw new NotImplementedException();
         }
 
+        public override string GetModName()
+        {
+            return "Cards+";
+        }
+
         protected override string GetTitle()
         {
             return "Low Gravity";
