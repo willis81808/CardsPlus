@@ -15,6 +15,8 @@ namespace CardsPlusPlugin.Cards
         {
             gun.reloadTime = 0.5f;
             statModifiers.movementSpeed = 1.5f;
+
+            cardInfo.allowMultiple = false;
         }
         public override void OnAddCard(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)
         {
@@ -23,6 +25,11 @@ namespace CardsPlusPlugin.Cards
         public override void OnRemoveCard()
         {
             //throw new NotImplementedException();
+        }
+
+        public override string GetModName()
+        {
+            return "Cards+";
         }
 
         protected override string GetTitle()

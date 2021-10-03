@@ -5,6 +5,7 @@ using UnboundLib;
 using UnboundLib.Networking;
 using System.Collections;
 using HarmonyLib;
+using CardChoiceSpawnUniqueCardPatch.CustomCategories;
 
 namespace CardsPlusPlugin.Cards
 {
@@ -15,6 +16,9 @@ namespace CardsPlusPlugin.Cards
             var block = gameObject.AddComponent<Block>();
             block.InvokeMethod("ResetStats");
             block.cdAdd = 3f;
+
+            cardInfo.categories = new CardCategory[] { CustomCardCategories.instance.CardCategory("Phantom") };
+            cardInfo.blacklistedCategories = new CardCategory[] { CustomCardCategories.instance.CardCategory("Ghost") };
         }
         public override void OnAddCard(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)
         {
@@ -28,6 +32,11 @@ namespace CardsPlusPlugin.Cards
         public override void OnRemoveCard()
         {
             //throw new NotImplementedException();
+        }
+
+        public override string GetModName()
+        {
+            return "Cards+";
         }
 
         protected override string GetTitle()

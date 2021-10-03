@@ -13,10 +13,12 @@ namespace CardsPlusPlugin.Cards
     {
         public override void SetupCard(CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers)
         {
-            statModifiers.movementSpeed = 0.70f;
+            statModifiers.movementSpeed = 0.50f;
             var block = gameObject.AddComponent<Block>();
             block.InvokeMethod("ResetStats");
-            block.cdMultiplier = 0.3f;
+            block.cdMultiplier = 0.5f;
+
+            cardInfo.allowMultiple = false;
         }
         public override void OnAddCard(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)
         {
@@ -26,7 +28,12 @@ namespace CardsPlusPlugin.Cards
         {
             //throw new NotImplementedException();
         }
-        
+
+        public override string GetModName()
+        {
+            return "Cards+";
+        }
+
         protected override string GetTitle()
         {
             return "Turtle";
@@ -51,14 +58,14 @@ namespace CardsPlusPlugin.Cards
                 {
                     positive = true,
                     stat = "Block cooldown",
-                    amount = "-70%",
+                    amount = "-50%",
                     simepleAmount = CardInfoStat.SimpleAmount.aLotLower
                 },
                 new CardInfoStat()
                 {
                     positive = false,
                     stat = "Movement Speed",
-                    amount = "-30%",
+                    amount = "-50%",
                     simepleAmount = CardInfoStat.SimpleAmount.aLotLower
                 }
             };

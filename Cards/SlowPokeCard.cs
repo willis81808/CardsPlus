@@ -24,7 +24,12 @@ namespace CardsPlusPlugin.Cards
         }
         public override void OnRemoveCard()
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+        }
+        
+        public override string GetModName()
+        {
+            return "Cards+";
         }
 
         protected override string GetTitle()

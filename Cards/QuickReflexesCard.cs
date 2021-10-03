@@ -25,6 +25,11 @@ namespace CardsPlusPlugin.Cards
         }
         public override void OnRemoveCard() { }
 
+        public override string GetModName()
+        {
+            return "Cards+";
+        }
+
         protected override string GetTitle()
         {
             return "Quick Reflexes";

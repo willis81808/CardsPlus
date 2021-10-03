@@ -37,6 +37,11 @@ namespace CardsPlusPlugin.Cards
 
         public override void OnRemoveCard() { }
 
+        public override string GetModName()
+        {
+            return "Cards+";
+        }
+
         protected override string GetTitle()
         {
             return "Snake Attack";
@@ -44,7 +49,7 @@ namespace CardsPlusPlugin.Cards
 
         protected override string GetDescription()
         {
-            return "I'm tired of all these goddamn snakes on this goddamn plane!";
+            return "I have had it with these motherfucking snakes on this motherfucking plane!";
         }
 
         protected override CardInfoStat[] GetStats()
@@ -54,7 +59,7 @@ namespace CardsPlusPlugin.Cards
 
         protected override CardInfo.Rarity GetRarity()
         {
-            return CardInfo.Rarity.Uncommon;
+            return CardInfo.Rarity.Rare;
         }
 
         protected override GameObject GetCardArt()
@@ -87,7 +92,7 @@ namespace CardsPlusPlugin.Cards
 
             Destroy(gameObject, 1f);
 
-            if (!PhotonNetwork.OfflineMode && !PhotonNetwork.IsMasterClient) return;
+            if (SnakeFollow.maxSnakeCount <= SnakeFollow.snakeCount || (!PhotonNetwork.OfflineMode && !PhotonNetwork.IsMasterClient)) return;
 
             this.ExecuteAfterSeconds(0.1f, () =>
             {
@@ -100,6 +105,9 @@ namespace CardsPlusPlugin.Cards
     [RequireComponent(typeof(Rigidbody2D), typeof(LineRenderer))]
     public class SnakeFollow : MonoBehaviour
     {
+        internal static int snakeCount = 0;
+        internal static readonly int maxSnakeCount = 20;
+
         private Rigidbody2D rb;
         private PhotonView view;
         private LineRenderer line;
@@ -118,7 +126,7 @@ namespace CardsPlusPlugin.Cards
 
         static SnakeFollow()
         {
-            GameModeManager.AddHook(GameModeHooks.HookBattleStart, DeleteAllSnakes);
+            GameModeManager.AddHook(GameModeHooks.HookPointEnd, DeleteAllSnakes);
         }
 
         private static IEnumerator DeleteAllSnakes(IGameModeHandler gm)
@@ -136,6 +144,8 @@ namespace CardsPlusPlugin.Cards
             rb = GetComponent<Rigidbody2D>();
             view = GetComponent<PhotonView>();
             line = GetComponent<LineRenderer>();
+
+            snakeCount++;
         }
         
         private void Start()
@@ -257,6 +267,11 @@ namespace CardsPlusPlugin.Cards
             }, Color.red);
 
             PhotonNetwork.Destroy(gameObject);
+        }
+
+        private void OnDestroy()
+        {
+            snakeCount--;
         }
     }
 }
