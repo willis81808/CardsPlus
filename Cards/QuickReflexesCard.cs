@@ -72,18 +72,38 @@ namespace CardsPlusPlugin.Cards
         {
             player = GetComponent<Player>();
         }
+        void Start()
+        {
+            if (player == null)
+            {
+                Destroy(this);
+            }
+        }
         void Update()
         {
-            foreach (var b in FindObjectsOfType<MoveTransform>())
+            foreach (BulletWrapper bulletWrapper in GetAllBullets())
             {
-                var canBlock = player.data.block.counter >= player.data.block.Cooldown();
-                var isMine = b.GetComponent<SpawnedAttack>().spawner == player;
-                if (canBlock && !isMine && Vector3.Distance(transform.position, b.transform.position) < 2)
+                RaycastHit2D raycastHit2D = Physics2D.Raycast(bulletWrapper.projectileMovement.transform.position, bulletWrapper.projectileMovement.velocity.normalized, bulletWrapper.velocity.magnitude * 5f * TimeHandler.deltaTime, LayerMask.GetMask("Default","Player","IgnorePlayer"));
+                if (raycastHit2D.transform && (!bulletWrapper.projectileHit.ownPlayer || bulletWrapper.projectileHit.ownPlayer != player) && raycastHit2D.collider.GetComponentInParent<Player>() == player)
                 {
-                    //Destroy(b.gameObject);
                     player.data.block.TryBlock();
                 }
             }
+        }
+        private List<BulletWrapper> GetAllBullets()
+        {
+            List<BulletWrapper> list = new List<BulletWrapper>();
+            ProjectileHit[] array = UnityEngine.Object.FindObjectsOfType<ProjectileHit>();
+            for (int i = 0; i < array.Length; i++)
+            {
+                BulletWrapper bulletWrapper = new BulletWrapper();
+                bulletWrapper.projectileHit = array[i].GetComponent<ProjectileHit>();
+                bulletWrapper.projectileMovement = array[i].GetComponent<MoveTransform>();
+                bulletWrapper.damage = bulletWrapper.projectileHit.damage;
+                bulletWrapper.velocity = bulletWrapper.projectileMovement.velocity;
+                list.Add(bulletWrapper);
+            }
+            return list;
         }
 
         //[HarmonyPatch(typeof(Block), "RPCA_DoBlock")]
