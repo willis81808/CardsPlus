@@ -7,6 +7,7 @@ using UnboundLib;
 using HarmonyLib;
 using UnboundLib.Cards;
 using UnityEngine;
+using Photon.Pun;
 
 namespace CardsPlusPlugin.Cards
 {
@@ -66,63 +67,61 @@ namespace CardsPlusPlugin.Cards
 
     public class QuickReflexesEffect : MonoBehaviour
     {
-        private Player player;
+        // blank mono which just marks the player as being able to autoblock
+    }
+    // necessary patches
 
-        void Awake()
-        {
-            player = GetComponent<Player>();
-        }
-        void Start()
-        {
-            if (player == null)
-            {
-                Destroy(this);
-            }
-        }
-        void Update()
-        {
-            foreach (BulletWrapper bulletWrapper in GetAllBullets())
-            {
-                RaycastHit2D raycastHit2D = Physics2D.Raycast(bulletWrapper.projectileMovement.transform.position, bulletWrapper.projectileMovement.velocity.normalized, bulletWrapper.velocity.magnitude * 5f * TimeHandler.deltaTime, LayerMask.GetMask("Default","Player","IgnorePlayer"));
-                if (raycastHit2D.transform && (!bulletWrapper.projectileHit.ownPlayer || bulletWrapper.projectileHit.ownPlayer != player) && raycastHit2D.collider.GetComponentInParent<Player>() == player)
-                {
-                    player.data.block.TryBlock();
-                }
-            }
-        }
-        private List<BulletWrapper> GetAllBullets()
-        {
-            List<BulletWrapper> list = new List<BulletWrapper>();
-            ProjectileHit[] array = UnityEngine.Object.FindObjectsOfType<ProjectileHit>();
-            for (int i = 0; i < array.Length; i++)
-            {
-                BulletWrapper bulletWrapper = new BulletWrapper();
-                bulletWrapper.projectileHit = array[i].GetComponent<ProjectileHit>();
-                bulletWrapper.projectileMovement = array[i].GetComponent<MoveTransform>();
-                bulletWrapper.damage = bulletWrapper.projectileHit.damage;
-                bulletWrapper.velocity = bulletWrapper.projectileMovement.velocity;
-                list.Add(bulletWrapper);
-            }
-            return list;
-        }
+    // these patches were not running previously when put inside QuickReflexesEffect
+    // organizing them this way causes them to run properly
 
-        //[HarmonyPatch(typeof(Block), "RPCA_DoBlock")]
-        //[HarmonyPostfix]
-        //static void Block_PostFix(Block __instance, bool firstBlock, bool dontSetCD, BlockTrigger.BlockTriggerType triggerType, Vector3 useBlockPos, bool onlyBlockEffects)
-        //{
-        //    var phantomEffect = __instance.GetComponent<PhantomEffect>();
-        //    if ((phantomEffect == null) || (triggerType != BlockTrigger.BlockTriggerType.Default)) return;
-        //    phantomEffect.StartEffect();
-        //}
-
-        [HarmonyPatch(typeof(Block), "ResetStats")]
-        [HarmonyPostfix]
-        static void ResetStats_PostFix(Block __instance)
+    [HarmonyPatch(typeof(Block), "ResetStats")]
+    class BlockPatchResetStats
+    {
+        static void PostFix(Block __instance)
         {
             var quickReflexesEffect = __instance.GetComponent<QuickReflexesEffect>();
             if (quickReflexesEffect != null)
             {
-                Destroy(quickReflexesEffect);
+                GameObject.Destroy(quickReflexesEffect);
+            }
+        }
+    }
+    [HarmonyPatch(typeof(ProjectileHit), "RPCA_DoHit")]
+    [HarmonyPriority(Priority.First)]
+    class ProjectileHitPatchRPCA_DoHit
+    {
+        private static void Prefix(ProjectileHit __instance, Vector2 hitPoint, Vector2 hitNormal, Vector2 vel, int viewID, int colliderID, ref bool wasBlocked)
+        {
+            // prefix to allow autoblocking
+
+            HitInfo hitInfo = new HitInfo();
+            hitInfo.point = hitPoint;
+            hitInfo.normal = hitNormal;
+            hitInfo.collider = null;
+            if (viewID != -1)
+            {
+                PhotonView photonView = PhotonNetwork.GetPhotonView(viewID);
+                hitInfo.collider = photonView.GetComponentInChildren<Collider2D>();
+                hitInfo.transform = photonView.transform;
+            }
+            else if (colliderID != -1)
+            {
+                hitInfo.collider = MapManager.instance.currentMap.Map.GetComponentsInChildren<Collider2D>()[colliderID];
+                hitInfo.transform = hitInfo.collider.transform;
+            }
+            HealthHandler healthHandler = null;
+            if (hitInfo.transform)
+            {
+                healthHandler = hitInfo.transform.GetComponent<HealthHandler>();
+            }
+            if (healthHandler && healthHandler.GetComponent<CharacterData>() && healthHandler.GetComponent<Block>())
+            {
+                Block block = healthHandler.GetComponent<Block>();
+                if (healthHandler.GetComponent<QuickReflexesEffect>() != null && block.counter >= block.Cooldown())
+                {
+                    wasBlocked = true;
+                    if (healthHandler.GetComponent<CharacterData>().view.IsMine) { block.TryBlock(); }
+                }
             }
         }
     }
