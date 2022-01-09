@@ -117,7 +117,8 @@ namespace CardsPlusPlugin.Cards
             if (healthHandler && healthHandler.GetComponent<CharacterData>() && healthHandler.GetComponent<Block>())
             {
                 Block block = healthHandler.GetComponent<Block>();
-                if (healthHandler.GetComponent<QuickReflexesEffect>() != null && block.counter >= block.Cooldown())
+                CharacterData data = healthHandler.GetComponent<CharacterData>();
+                if (healthHandler.GetComponent<QuickReflexesEffect>() != null && block.counter >= block.Cooldown() && !data.isSilenced && !data.isStunned)
                 {
                     wasBlocked = true;
                     if (healthHandler.GetComponent<CharacterData>().view.IsMine) { block.TryBlock(); }
