@@ -17,14 +17,14 @@ namespace CardsPlusPlugin.Cards
 
             if (spawner != null)
             {
-                spawner.StartInvoke(spawner.delay / 2);
+                spawner.Upgrade();
             }
             else
             {
                 spawner = player.gameObject.AddComponent<SwordSpawner>();
             }
 
-            spawner.target = PlayerManager.instance.GetOtherPlayer(player).transform;
+            //spawner.target = PlayerManager.instance.GetOtherPlayer(player).transform;
             spawner.swordPrefab = Assets.SwordPrefab;
 
             block.BlockAction += (type) =>
@@ -43,7 +43,12 @@ namespace CardsPlusPlugin.Cards
         public override void SetupCard(CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers, Block block)
         {
             block.InvokeMethod("ResetStats");
-            block.cdMultiplier = 0.6f;
+            block.cdMultiplier = 1.25f;
+        }
+
+        public override string GetModName()
+        {
+            return "Cards+";
         }
 
         protected override string GetTitle()
@@ -58,17 +63,26 @@ namespace CardsPlusPlugin.Cards
 
         protected override GameObject GetCardArt()
         {
-            return null;
+            return Assets.ExcaliburArt;
         }
 
         protected override CardInfo.Rarity GetRarity()
         {
-            return CardInfo.Rarity.Common;
+            return CardInfo.Rarity.Rare;
         }
 
         protected override CardInfoStat[] GetStats()
         {
-            return null;
+            return new CardInfoStat[]
+            {
+                new CardInfoStat()
+                {
+                    positive = false,
+                    stat = "Block cooldown",
+                    amount = "+25%",
+                    simepleAmount = CardInfoStat.SimpleAmount.slightlyLower
+                }
+            };
         }
 
         protected override CardThemeColor.CardThemeColorType GetTheme()
@@ -96,6 +110,8 @@ namespace CardsPlusPlugin.Cards
         private Rigidbody2D rb;
 
         private bool canDamage = true;
+
+        public int damage = 75;
 
         private void Awake()
         {
@@ -149,12 +165,19 @@ namespace CardsPlusPlugin.Cards
             {
                 canDamage = false;
                 Instantiate(destroyParticles, transform.position, destroyParticles.transform.rotation);
-                DamageTarget(target);
+                DamageTarget(target, damage);
+                Destroy(gameObject, 0.1f);
+            }
+
+            if (Time.time - trackStartTime > 0.25f && canDamage && Physics2D.OverlapCircle(transform.position, 0.2f) != null)
+            {
+                canDamage = false;
+                Instantiate(destroyParticles, transform.position, destroyParticles.transform.rotation);
                 Destroy(gameObject, 0.1f);
             }
         }
 
-        private void DamageTarget(Transform damageTarget, int damage = 75)
+        private void DamageTarget(Transform damageTarget, int damage)
         {
             var healthHandler = damageTarget.GetComponentInChildren<HealthHandler>();
             healthHandler.CallTakeDamage(damage * (damageTarget.position - transform.position), transform.position);
@@ -183,7 +206,30 @@ namespace CardsPlusPlugin.Cards
 
         public float delay = 2f;
 
-        public Transform target;
+        private int damage = 75;
+
+        private int spawnMax = 6;
+
+        private int range = 20;
+
+        private float scaleDelta = 0;
+
+        public Transform target {
+            get
+            {
+                var results = Physics2D.OverlapCircleAll(transform.position, range)
+                    .OrderBy(r => Vector3.Distance(transform.position, r.transform.position));
+
+                foreach (var r in results)
+                {
+                    var player = r.GetComponent<Player>();
+                    if (player != null && player.transform != transform)
+                        return player.transform;
+                }
+
+                return null;
+            }
+        }
 
         private GameObject targetPointHolder;
 
@@ -220,6 +266,28 @@ namespace CardsPlusPlugin.Cards
             }
         }
 
+        public void Upgrade()
+        {
+            // fire faster
+            delay /= 2;
+            StartInvoke(delay);
+
+            // increase max sword count
+            spawnMax *= 2;
+
+            // increase target range
+            pointDistance += 0.2f;
+
+            // increase damage
+            damage *= 2;
+
+            // increase range
+            range += 5;
+
+            // increase sword size
+            scaleDelta += 0.2f;
+        }
+
         void Fire()
         {
             if (swords.Count == 0 || target == null || Vector3.Distance(transform.position, target.position) > pointDistance * 10) return;
@@ -228,8 +296,17 @@ namespace CardsPlusPlugin.Cards
         
         public void SpawnSword()
         {
+            if (swords.Count >= spawnMax)
+                return;
+
             var data = new SwordData();
             data.sword = Instantiate(swordPrefab, transform.position, swordPrefab.transform.rotation);
+            data.sword.transform.localScale += Vector3.one * scaleDelta;
+            
+            var behaviour = data.sword.GetComponent<SwordBehaviour>();
+            behaviour.damage = damage;
+            behaviour.minDistance += scaleDelta;
+
             data.point = new GameObject("Follow Point");
             data.point.transform.SetParent(targetPointHolder.transform);
             swords.Add(data);
@@ -239,8 +316,9 @@ namespace CardsPlusPlugin.Cards
         
         public void ShootSword()
         {
-            var data = swords[0];
-            swords.RemoveAt(0);
+            int randIndex = UnityEngine.Random.Range(0, swords.Count);
+            var data = swords[randIndex];
+            swords.RemoveAt(randIndex);
 
             Destroy(data.point);
 

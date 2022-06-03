@@ -16,7 +16,7 @@ using System.Collections;
 namespace CardsPlusPlugin
 {
     [BepInDependency("com.willis.rounds.unbound", BepInDependency.DependencyFlags.HardDependency)]
-    [BepInPlugin(ModId, ModName, "1.1.5")]
+    [BepInPlugin(ModId, ModName, "1.2.0")]
     [BepInProcess("Rounds.exe")]
     public class CardsPlus : BaseUnityPlugin
     {
@@ -57,7 +57,7 @@ namespace CardsPlusPlugin
             CustomCard.BuildCard<QuickReflexesCard>();
             CustomCard.BuildCard<LowGravityCard>();
             CustomCard.BuildCard<SnakeAttackCard>();
-            //CustomCard.BuildCard<ExcaliburCard>();
+            CustomCard.BuildCard<ExcaliburCard>();
         }
     }
 }

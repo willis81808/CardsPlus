@@ -26,6 +26,8 @@ namespace CardsPlusPlugin
 
         public static GameObject LowGravityArt = Bundle.LoadAsset<GameObject>("C_LowGravity");
 
+        public static GameObject ExcaliburArt = Bundle.LoadAsset<GameObject>("C_Excalibur");
+
         public static GameObject SnakePrefab = Bundle.LoadAsset<GameObject>("Snake").AddComponent<Cards.SnakeFollow>().gameObject.AddComponent<PhotonView>().gameObject.AddComponent<NetworkPhysicsObject>().gameObject;
         public static GameObject SnakeSpawner = new GameObject("Snake Spawner").AddComponent<Cards.SnakeSpawner>().gameObject;
 

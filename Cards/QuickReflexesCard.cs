@@ -69,11 +69,10 @@ namespace CardsPlusPlugin.Cards
     {
         // blank mono which just marks the player as being able to autoblock
     }
-    // necessary patches
 
+    // Necessary patches:
     // these patches were not running previously when put inside QuickReflexesEffect
     // organizing them this way causes them to run properly
-
     [HarmonyPatch(typeof(Block), "ResetStats")]
     class BlockPatchResetStats
     {
