@@ -49,7 +49,7 @@ namespace CardsPlusPlugin.Cards
 
         protected override string GetDescription()
         {
-            return "I have had it with these motherfucking snakes on this motherfucking plane!";
+            return "Snakes... Why did it have to be snakes??";
         }
 
         protected override CardInfoStat[] GetStats()
@@ -59,28 +59,23 @@ namespace CardsPlusPlugin.Cards
 
         protected override CardInfo.Rarity GetRarity()
         {
-            return CardInfo.Rarity.Rare;
+            return CardInfo.Rarity.Uncommon;
         }
 
         protected override GameObject GetCardArt()
         {
-            return null;
+            return Assets.SnakeAttackArt;
         }
 
         protected override CardThemeColor.CardThemeColorType GetTheme()
         {
-            return CardThemeColor.CardThemeColorType.EvilPurple;
+            return CardThemeColor.CardThemeColorType.PoisonGreen;
         }
     }
 
     public class SnakeSpawner : MonoBehaviour
     {
         private static bool Initialized = false;
-
-        void Awake()
-        {
-            PhotonNetwork.PrefabPool.RegisterPrefab(Assets.SnakePrefab.name, Assets.SnakePrefab);
-        }
 
         void Start()
         {
@@ -123,21 +118,6 @@ namespace CardsPlusPlugin.Cards
         public Transform target;
 
         private static readonly int DamageLayerMask = LayerMask.GetMask("Player");
-
-        static SnakeFollow()
-        {
-            GameModeManager.AddHook(GameModeHooks.HookPointEnd, DeleteAllSnakes);
-        }
-
-        private static IEnumerator DeleteAllSnakes(IGameModeHandler gm)
-        {
-            var snakes = FindObjectsOfType<SnakeFollow>();
-            for (int i = 0; i < snakes.Length; i++)
-            {
-                PhotonNetwork.Destroy(snakes[i].gameObject);
-            }
-            yield break;
-        }
 
         private void Awake()
         {
@@ -190,9 +170,12 @@ namespace CardsPlusPlugin.Cards
         private void Update()
         {
             // follow nearest player
+            /*
             target = (from p in PlayerManager.instance.players
                       orderby Vector3.Distance(p.transform.position, transform.position)
                       select p.transform).FirstOrDefault();
+            */
+            target = PlayerManager.instance.GetClosestPlayer(transform.position)?.transform;
 
             // check if should deal damage
             var nearby = Physics2D.OverlapCircleAll((Vector2)transform.position + rb.velocity.normalized * 0.4f, 1f, DamageLayerMask);

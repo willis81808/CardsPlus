@@ -110,10 +110,12 @@
     <Compile Include="Cards\ExcaliburCard.cs" />
     <Compile Include="Cards\FragmentCard.cs" />
     <Compile Include="Cards\HareCard.cs" />
+    <Compile Include="Cards\HotPotato.cs" />
     <Compile Include="Cards\LowGravityCard.cs" />
     <Compile Include="Cards\MentalistCard.cs" />
     <Compile Include="Cards\QuickReflexesCard.cs" />
     <Compile Include="Cards\SlowPokeCard.cs" />
+    <Compile Include="Cards\SmokeGrenade.cs" />
     <Compile Include="Cards\SnakeAttackCard.cs" />
     <Compile Include="Cards\TerminatorCard.cs" />
     <Compile Include="Cards\PhantomCard.cs" />

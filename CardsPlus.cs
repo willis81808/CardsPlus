@@ -16,37 +16,25 @@ using System.Collections;
 namespace CardsPlusPlugin
 {
     [BepInDependency("com.willis.rounds.unbound", BepInDependency.DependencyFlags.HardDependency)]
-    [BepInPlugin(ModId, ModName, "1.2.0")]
+    [BepInPlugin(ModId, ModName, "1.4.0")]
     [BepInProcess("Rounds.exe")]
     public class CardsPlus : BaseUnityPlugin
     {
         private const string ModId = "com.willis.rounds.cardsplus";
         private const string ModName = "Cards Plus";
-
+        
         void Awake()
         {
             var harmony = new Harmony(ModId);
             harmony.PatchAll();
 
             GameModeManager.AddHook(GameModeHooks.HookGameEnd, ResetEffects);
+            GameModeManager.AddHook(GameModeHooks.HookRoundEnd, ResetRound);
+            GameModeManager.AddHook(GameModeHooks.HookPointEnd, ResetRound);
+
+            RegisterPrefabs();
         }
 
-        IEnumerator ResetEffects(IGameModeHandler gm)
-        {
-            DestroyAll<PhantomEffect>();
-            DestroyAll<QuickReflexesEffect>();
-            yield break;
-        }
-
-        void DestroyAll<T>() where T : UnityEngine.Object
-        {
-            var objects = GameObject.FindObjectsOfType<T>();
-            for (int i = objects.Length - 1; i >= 0; i--)
-            {
-                Destroy(objects[i]);
-            }
-        }
-        
         void Start()
         {
             CustomCard.BuildCard<HareCard>();
@@ -58,6 +46,49 @@ namespace CardsPlusPlugin
             CustomCard.BuildCard<LowGravityCard>();
             CustomCard.BuildCard<SnakeAttackCard>();
             CustomCard.BuildCard<ExcaliburCard>();
+            CustomCard.BuildCard<HotPotato>();
+            CustomCard.BuildCard<SmokeGrenade>();
+        }
+
+        private void RegisterPrefabs()
+        {
+            PhotonNetwork.PrefabPool.RegisterPrefab(Assets.SnakePrefab.name, Assets.SnakePrefab);
+            PhotonNetwork.PrefabPool.RegisterPrefab(Assets.SmokeObject.name, Assets.SmokeObject);
+        }
+
+        IEnumerator ResetEffects(IGameModeHandler gm)
+        {
+            DestroyAll<PhantomEffect>();
+            DestroyAll<QuickReflexesEffect>();
+            DestroyAll<SwordSpawner>();
+            DestroyAll<HotPotatoEffect>();
+            yield break;
+        }
+
+        IEnumerator ResetRound(IGameModeHandler gm)
+        {
+            foreach (var player in PlayerManager.instance.players)
+            {
+                var swordSpawner = player.GetComponent<SwordSpawner>();
+                if (swordSpawner != null) swordSpawner.Clear();
+            }
+
+            var snakes = FindObjectsOfType<SnakeFollow>();
+            for (int i = 0; i < snakes.Length; i++)
+            {
+                PhotonNetwork.Destroy(snakes[i].gameObject);
+            }
+
+            yield break;
+        }
+
+        void DestroyAll<T>() where T : UnityEngine.Object
+        {
+            var objects = GameObject.FindObjectsOfType<T>();
+            for (int i = objects.Length - 1; i >= 0; i--)
+            {
+                Destroy(objects[i]);
+            }
         }
     }
 }

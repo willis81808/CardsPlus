@@ -68,7 +68,7 @@ namespace CardsPlusPlugin.Cards
 
         protected override CardInfo.Rarity GetRarity()
         {
-            return CardInfo.Rarity.Rare;
+            return CardInfo.Rarity.Uncommon;
         }
 
         protected override CardInfoStat[] GetStats()
@@ -324,6 +324,18 @@ namespace CardsPlusPlugin.Cards
 
             data.sword.GetComponent<SwordBehaviour>().target = target;
 
+            UpdateSwordCount();
+        }
+
+        public void Clear()
+        {
+            for (int i = swords.Count - 1; i >= 0; i--)
+            {
+                var data = swords[i];
+                Destroy(data.sword);
+                Destroy(data.point);
+                swords.RemoveAt(i);
+            }
             UpdateSwordCount();
         }
 
