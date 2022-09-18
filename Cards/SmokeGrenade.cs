@@ -73,15 +73,8 @@ namespace CardsPlusPlugin.Cards
             var spawnedAttack = projectile.GetComponent<SpawnedAttack>();
             if (!spawnedAttack || !primed) return;
 
+            projectile.AddComponent<Grenade>();
             spawnedAttack.SetColor(Color.white);
-
-            var effect = new GameObject();
-            effect.AddComponent<Grenade>();
-            effect.transform.position = projectile.transform.position;
-            effect.transform.rotation = projectile.transform.rotation;
-            effect.transform.parent = projectile.transform;
-
-            print("Smoke Grenade attack!");
 
             primed = false;
         }
