@@ -66,7 +66,7 @@ namespace CardsPlusPlugin
         };
         public static GameObject AdwareCanvas = Bundle.LoadAsset<GameObject>("Adware UI")
             .AddComponent<PhotonView>().gameObject
-            .AddComponent<AdwarePlayerCanvasInitializer>().gameObject;
+            .AddComponent<PhotonMagicInitializer>().gameObject;
 
         static Assets()
         {

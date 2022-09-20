@@ -154,8 +154,6 @@ namespace CardsPlusPlugin.Cards
         }
     }
 
-    public class AdwarePlayerCanvasInitializer : PhotonMagicInitializer<AdwarePlayerCanvas> { }
-
     public class AdwarePlayerCanvas : PhotonInitializedMonoBehaviour
     {
         public Slider cooldownIndicator;
@@ -323,8 +321,8 @@ namespace CardsPlusPlugin.Cards
             var popup = Instantiate(Assets.PopupPrefab, canvas.transform).GetComponent<AdwarePopup>();
             var popupTransform = (RectTransform)popup.transform;
 
-            int maxDeltaX = Screen.width / 3;
-            int maxDeltaY = Screen.height / 3;
+            int maxDeltaX = (Screen.width - 500) / 2;
+            int maxDeltaY = (Screen.height - 400) / 2;
 
             popupTransform.anchoredPosition += new Vector2(Random.Range(-maxDeltaX, maxDeltaX), Random.Range(-maxDeltaY, maxDeltaY));
 

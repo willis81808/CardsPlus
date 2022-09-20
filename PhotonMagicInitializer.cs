@@ -13,11 +13,11 @@ namespace CardsPlusPlugin
         public abstract void OnInstantiate(object[] data);
     }
 
-    public class PhotonMagicInitializer<T> : MonoBehaviour, IPunInstantiateMagicCallback where T : PhotonInitializedMonoBehaviour
+    public class PhotonMagicInitializer : MonoBehaviour, IPunInstantiateMagicCallback
     {
         public void OnPhotonInstantiate(PhotonMessageInfo info)
         {
-            GetComponent<T>().OnInstantiate(info.photonView.InstantiationData);
+            GetComponent<PhotonInitializedMonoBehaviour>().OnInstantiate(info.photonView.InstantiationData);
         }
     }
 }

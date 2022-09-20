@@ -16,13 +16,12 @@ using System.Collections;
 namespace CardsPlusPlugin
 {
     [BepInDependency("com.willis.rounds.unbound", BepInDependency.DependencyFlags.HardDependency)]
-    [BepInPlugin(ModId, ModName, "1.5.0")]
+    [BepInPlugin(ModId, ModName, "1.5.1")]
     [BepInProcess("Rounds.exe")]
     public class CardsPlus : BaseUnityPlugin
     {
         private const string ModId = "com.willis.rounds.cardsplus";
         private const string ModName = "Cards Plus";
-        public const string TEST = "";
         
         void Awake()
         {
