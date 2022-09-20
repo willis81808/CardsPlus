@@ -27,6 +27,7 @@ namespace CardsPlusPlugin
         public static GameObject ExcaliburArt = Bundle.LoadAsset<GameObject>("C_Excalibur");
         public static GameObject HotPotatoArt = Bundle.LoadAsset<GameObject>("C_HotPotato");
         public static GameObject SmokeGrenadeArt = Bundle.LoadAsset<GameObject>("C_SmokeGrenade");
+        public static GameObject AdwareArt = Bundle.LoadAsset<GameObject>("C_Adware");
 
         /*
          * CARD ASSETS
@@ -46,6 +47,24 @@ namespace CardsPlusPlugin
         // Smoke Grenade
         public static GameObject SmokeObject = Bundle.LoadAsset<GameObject>("Smoke Object").AddComponent<PhotonView>().gameObject;
         public static GameObject SmokeEffect = Bundle.LoadAsset<GameObject>("Smoke Effect");
+
+        // Adware
+        public static GameObject PlayerSelector = Bundle.LoadAsset<GameObject>("Player Selector");
+        public static GameObject PopupPrefab = Bundle.LoadAsset<GameObject>("Popup Window");
+        public static GameObject[] PopupContents = new GameObject[]
+        {
+            Bundle.LoadAsset<GameObject>("popup-body-1"),
+            Bundle.LoadAsset<GameObject>("popup-body-2"),
+            Bundle.LoadAsset<GameObject>("popup-body-3"),
+            Bundle.LoadAsset<GameObject>("popup-body-4"),
+            Bundle.LoadAsset<GameObject>("popup-body-5"),
+            Bundle.LoadAsset<GameObject>("popup-body-6"),
+            Bundle.LoadAsset<GameObject>("popup-body-7"),
+            Bundle.LoadAsset<GameObject>("popup-body-8"),
+        };
+        public static GameObject AdwareCanvas = Bundle.LoadAsset<GameObject>("Adware UI")
+            .AddComponent<PhotonView>().gameObject
+            .AddComponent<AdwarePlayerCanvasInitializer>().gameObject;
 
         static Assets()
         {

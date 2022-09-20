@@ -72,6 +72,10 @@
     <Reference Include="UnboundLib, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\UnboundLib.3.0.0\lib\net461\UnboundLib.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.TextMeshPro, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>A:\Program Files\SteamLibrary\steamapps\common\ROUNDS\Rounds_Data\Managed\Unity.TextMeshPro.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>A:\Program Files\SteamLibrary\steamapps\common\ROUNDS\Rounds_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
@@ -107,6 +111,7 @@
   <ItemGroup>
     <Compile Include="Assets.cs" />
     <Compile Include="CardsPlus.cs" />
+    <Compile Include="Cards\AdwareCard.cs" />
     <Compile Include="Cards\ExcaliburCard.cs" />
     <Compile Include="Cards\FragmentCard.cs" />
     <Compile Include="Cards\HareCard.cs" />
@@ -120,6 +125,7 @@
     <Compile Include="Cards\TerminatorCard.cs" />
     <Compile Include="Cards\PhantomCard.cs" />
     <Compile Include="Cards\TurtleCard.cs" />
+    <Compile Include="PhotonMagicInitializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -22,6 +22,7 @@ namespace CardsPlusPlugin
     {
         private const string ModId = "com.willis.rounds.cardsplus";
         private const string ModName = "Cards Plus";
+        public const string TEST = "";
         
         void Awake()
         {
@@ -37,6 +38,7 @@ namespace CardsPlusPlugin
 
         void Start()
         {
+            /*
             CustomCard.BuildCard<HareCard>();
             CustomCard.BuildCard<TurtleCard>();
             CustomCard.BuildCard<TerminatorCard>();
@@ -48,12 +50,15 @@ namespace CardsPlusPlugin
             CustomCard.BuildCard<ExcaliburCard>();
             CustomCard.BuildCard<HotPotato>();
             CustomCard.BuildCard<SmokeGrenade>();
+            */
+            CustomCard.BuildCard<AdwareCard>();
         }
 
         private void RegisterPrefabs()
         {
             PhotonNetwork.PrefabPool.RegisterPrefab(Assets.SnakePrefab.name, Assets.SnakePrefab);
             PhotonNetwork.PrefabPool.RegisterPrefab(Assets.SmokeObject.name, Assets.SmokeObject);
+            PhotonNetwork.PrefabPool.RegisterPrefab(Assets.AdwareCanvas.name, Assets.AdwareCanvas);
         }
 
         IEnumerator ResetEffects(IGameModeHandler gm)
@@ -62,6 +67,7 @@ namespace CardsPlusPlugin
             DestroyAll<QuickReflexesEffect>();
             DestroyAll<SwordSpawner>();
             DestroyAll<HotPotatoEffect>();
+            DestroyAll<SmokeLauncher>();
             yield break;
         }
 
@@ -77,6 +83,11 @@ namespace CardsPlusPlugin
             for (int i = 0; i < snakes.Length; i++)
             {
                 PhotonNetwork.Destroy(snakes[i].gameObject);
+            }
+
+            foreach (var adwareHandler in FindObjectsOfType<AdwarePopup>())
+            {
+                Destroy(adwareHandler.gameObject);
             }
 
             yield break;
