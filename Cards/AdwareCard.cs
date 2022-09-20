@@ -25,11 +25,15 @@ namespace CardsPlusPlugin.Cards
 
         public override void OnAddCard(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)
         {
+            if (!player.data.view.IsMine) return;
+
             player.gameObject.AddComponent<AdwareHandler>();
         }
 
         public override void OnRemoveCard(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)
         {
+            if (!player.data.view.IsMine) return;
+
             var adwareHandler = player.gameObject.GetComponent<AdwareHandler>();
             if (adwareHandler)
             {
@@ -40,7 +44,7 @@ namespace CardsPlusPlugin.Cards
         protected override string GetTitle() => "Adware";
         protected override string GetDescription() => "Press <color=\"purple\">F</color> to enter <color=\"red\">Hacker Mode</color>! When you select a target they'll be bombarded with annoying popup advertisements";
         public override string GetModName() => "Cards+";
-        protected override CardInfo.Rarity GetRarity() => CardInfo.Rarity.Common;
+        protected override CardInfo.Rarity GetRarity() => CardInfo.Rarity.Uncommon;
         protected override CardThemeColor.CardThemeColorType GetTheme() => CardThemeColor.CardThemeColorType.EvilPurple;
         protected override GameObject GetCardArt() => Assets.AdwareArt;
         protected override CardInfoStat[] GetStats() => null;
@@ -48,7 +52,7 @@ namespace CardsPlusPlugin.Cards
 
     public class AdwareHandler : MonoBehaviour
     {
-        private const float COOLDOWN = 10f;
+        private const float COOLDOWN = 15f;
         private const int AD_COUNT = 5;
 
         private Player player;
@@ -115,10 +119,22 @@ namespace CardsPlusPlugin.Cards
         {
             ToggleReady();
 
-            NetworkingManager.RPC(typeof(AdwareHandler), nameof(RPC_CreatePopups), AD_COUNT, target.playerID);
+            // Send hacked network messages
+            this.ExecuteAfterSeconds(0.5f, () =>
+            {
+                NetworkingManager.RPC(typeof(AdwareHandler), nameof(RPC_CreatePopups), AD_COUNT, target.playerID);
+                NetworkingManager.RPC(typeof(AdwareHandler), nameof(RPC_ShowHackedFeedback), target.playerID);
+            });
 
             cooling = true;
             StartCoroutine(visuals.CooldownCoroutine(COOLDOWN, () => cooling = false));
+        }
+        
+        [UnboundRPC]
+        private static void RPC_ShowHackedFeedback(int playerId)
+        {
+            var target = PlayerManager.instance.players.Where(p => p.playerID == playerId).FirstOrDefault();
+            Instantiate(Assets.HackedTargetEffect, target.transform);
         }
 
         [UnboundRPC]
@@ -156,10 +172,13 @@ namespace CardsPlusPlugin.Cards
         public void Start()
         {
             cooldownIndicator.value = 1;
+            cooldownIndicator.gameObject.SetActive(false);
         }
 
         public IEnumerator CooldownCoroutine(float duration, Action callback)
         {
+            cooldownIndicator.gameObject.SetActive(true);
+
             CooldownValue = 0;
 
             float time = Time.time;
@@ -170,6 +189,8 @@ namespace CardsPlusPlugin.Cards
             }
 
             CooldownValue = 1;
+
+            cooldownIndicator.gameObject.SetActive(false);
 
             callback?.Invoke();
         }
@@ -187,7 +208,9 @@ namespace CardsPlusPlugin.Cards
         [PunRPC]
         public void RPC_SetValue(float value)
         {
+
             cooldownIndicator.value = value;
+            cooldownIndicator.gameObject.SetActive(value < 1);
         }
     }
 
@@ -247,6 +270,7 @@ namespace CardsPlusPlugin.Cards
         private static Canvas canvas => Unbound.Instance.canvas;
 
         private static int titlesCounter = 0, contentsCounter = 0;
+
         private static string[] popupTitles = new string[]
         {
             "WINNER WINNER WINNER!",

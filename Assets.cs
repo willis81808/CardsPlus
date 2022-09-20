@@ -51,6 +51,7 @@ namespace CardsPlusPlugin
         // Adware
         public static GameObject PlayerSelector = Bundle.LoadAsset<GameObject>("Player Selector");
         public static GameObject PopupPrefab = Bundle.LoadAsset<GameObject>("Popup Window");
+        public static GameObject HackedTargetEffect = Bundle.LoadAsset<GameObject>("HackedTargetEffect");
         public static GameObject[] PopupContents = new GameObject[]
         {
             Bundle.LoadAsset<GameObject>("popup-body-1"),
@@ -61,6 +62,7 @@ namespace CardsPlusPlugin
             Bundle.LoadAsset<GameObject>("popup-body-6"),
             Bundle.LoadAsset<GameObject>("popup-body-7"),
             Bundle.LoadAsset<GameObject>("popup-body-8"),
+            Bundle.LoadAsset<GameObject>("popup-body-9")
         };
         public static GameObject AdwareCanvas = Bundle.LoadAsset<GameObject>("Adware UI")
             .AddComponent<PhotonView>().gameObject
