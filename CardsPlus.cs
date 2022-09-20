@@ -38,7 +38,6 @@ namespace CardsPlusPlugin
 
         void Start()
         {
-            /*
             CustomCard.BuildCard<HareCard>();
             CustomCard.BuildCard<TurtleCard>();
             CustomCard.BuildCard<TerminatorCard>();
@@ -50,7 +49,6 @@ namespace CardsPlusPlugin
             CustomCard.BuildCard<ExcaliburCard>();
             CustomCard.BuildCard<HotPotato>();
             CustomCard.BuildCard<SmokeGrenade>();
-            */
             CustomCard.BuildCard<AdwareCard>();
         }
 
