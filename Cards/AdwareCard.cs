@@ -253,7 +253,7 @@ namespace CardsPlusPlugin.Cards
 
             foreach (var player in PlayerManager.instance.players)
             {
-                //if (player.teamID == teamId) continue;
+                if (player.teamID == teamId) continue;
 
                 var selector = Instantiate(Assets.PlayerSelector, player.transform).GetComponent<PlayerSelector>();
                 selector.OnPlayerClicked += selectedCallback;
@@ -296,13 +296,11 @@ namespace CardsPlusPlugin.Cards
         private void RandomizeTitle()
         {
             titleText.text = popupTitles[titlesCounter++ % popupTitles.Length];
-            //titleText.text = popupTitles[Random.Range(0, popupTitles.Length)];
         }
         
         private void RandomizeContents()
         {
             var prefab = Assets.PopupContents[contentsCounter++ % Assets.PopupContents.Length];
-            //var prefab = Assets.PopupContents[Random.Range(0, Assets.PopupContents.Length)];
             Instantiate(prefab, contentContainer);
         }
 

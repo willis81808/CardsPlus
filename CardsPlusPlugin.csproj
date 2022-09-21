@@ -112,6 +112,13 @@
     <Compile Include="Assets.cs" />
     <Compile Include="CardsPlus.cs" />
     <Compile Include="Cards\AdwareCard.cs" />
+    <Compile Include="Cards\Cyberpunk\BurnoutCard.cs" />
+    <Compile Include="Cards\Cyberpunk\ContagionCard.cs" />
+    <Compile Include="Cards\Cyberpunk\CyberpunkHandler.cs" />
+    <Compile Include="Cards\Cyberpunk\HamperCard.cs" />
+    <Compile Include="Cards\Cyberpunk\QuickhackMenu.cs" />
+    <Compile Include="Cards\Cyberpunk\QuickhackMenuOption.cs" />
+    <Compile Include="Cards\Cyberpunk\ShortCircuitCard.cs" />
     <Compile Include="Cards\ExcaliburCard.cs" />
     <Compile Include="Cards\FragmentCard.cs" />
     <Compile Include="Cards\HareCard.cs" />

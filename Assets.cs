@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CardsPlusPlugin.Cards;
+using CardsPlusPlugin.Cards.Cyberpunk;
 using Photon.Pun;
 using UnityEngine;
 
@@ -67,6 +68,16 @@ namespace CardsPlusPlugin
         public static GameObject AdwareCanvas = Bundle.LoadAsset<GameObject>("Adware UI")
             .AddComponent<PhotonView>().gameObject
             .AddComponent<PhotonMagicInitializer>().gameObject;
+
+        // Cyberpunk
+        public static GameObject QuickhackMenu = Bundle.LoadAsset<GameObject>("Quickhack Menu");
+        public static Dictionary<QuickhackMenuOption.QuickhackType, GameObject> QuickHacks = new Dictionary<QuickhackMenuOption.QuickhackType, GameObject>
+        {
+            { QuickhackMenuOption.QuickhackType.CONTAGION,      Bundle.LoadAsset<GameObject>("Contagion") },
+            { QuickhackMenuOption.QuickhackType.SHORT_CIRCUIT,  Bundle.LoadAsset<GameObject>("Short Circuit") },
+            { QuickhackMenuOption.QuickhackType.BURNOUT,        Bundle.LoadAsset<GameObject>("Burnout") },
+            { QuickhackMenuOption.QuickhackType.HAMPER,         Bundle.LoadAsset<GameObject>("Hamper") }
+        };
 
         static Assets()
         {

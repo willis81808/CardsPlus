@@ -8,6 +8,7 @@ using BepInEx;
 using UnboundLib;
 using UnboundLib.Cards;
 using CardsPlusPlugin.Cards;
+using CardsPlusPlugin.Cards.Cyberpunk;
 using HarmonyLib;
 using Photon.Pun;
 using UnboundLib.GameModes;
@@ -16,7 +17,7 @@ using System.Collections;
 namespace CardsPlusPlugin
 {
     [BepInDependency("com.willis.rounds.unbound", BepInDependency.DependencyFlags.HardDependency)]
-    [BepInPlugin(ModId, ModName, "1.5.1")]
+    [BepInPlugin(ModId, ModName, "1.5.2")]
     [BepInProcess("Rounds.exe")]
     public class CardsPlus : BaseUnityPlugin
     {
@@ -49,6 +50,11 @@ namespace CardsPlusPlugin
             CustomCard.BuildCard<HotPotato>();
             CustomCard.BuildCard<SmokeGrenade>();
             CustomCard.BuildCard<AdwareCard>();
+
+            CustomCard.BuildCard<ContagionCard>();
+            CustomCard.BuildCard<ShortCircuitCard>();
+            CustomCard.BuildCard<BurnoutCard>();
+            CustomCard.BuildCard<HamperCard>();
         }
 
         private void RegisterPrefabs()
