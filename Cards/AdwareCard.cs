@@ -253,7 +253,7 @@ namespace CardsPlusPlugin.Cards
 
             foreach (var player in PlayerManager.instance.players)
             {
-                if (player.teamID == teamId) continue;
+                //if (player.teamID == teamId) continue;
 
                 var selector = Instantiate(Assets.PlayerSelector, player.transform).GetComponent<PlayerSelector>();
                 selector.OnPlayerClicked += selectedCallback;
@@ -321,8 +321,8 @@ namespace CardsPlusPlugin.Cards
             var popup = Instantiate(Assets.PopupPrefab, canvas.transform).GetComponent<AdwarePopup>();
             var popupTransform = (RectTransform)popup.transform;
 
-            int maxDeltaX = (Screen.width - 500) / 2;
-            int maxDeltaY = (Screen.height - 400) / 2;
+            int maxDeltaX = (Screen.width / 2) - 500;
+            int maxDeltaY = (Screen.height / 2) - 400;
 
             popupTransform.anchoredPosition += new Vector2(Random.Range(-maxDeltaX, maxDeltaX), Random.Range(-maxDeltaY, maxDeltaY));
 
