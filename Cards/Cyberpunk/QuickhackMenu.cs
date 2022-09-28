@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnboundLib.Networking;
+using UnboundLib;
+using CardsPlusPlugin.Utils;
 
 namespace CardsPlusPlugin.Cards.Cyberpunk
 {
@@ -43,7 +46,9 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
 
             if (Input.GetMouseButtonDown(0))
             {
-                print($"Activated quickhack: {availableHacks[highlightedIndex].type}");
+                var quickHackType = availableHacks[highlightedIndex].type;
+                PlayerSelector.Instantiate(Assets.QuickhackSelectors[quickHackType], (target) => OnPlayerSelected(target, quickHackType));
+
                 Hide();
                 return;
             }
@@ -52,7 +57,7 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
 
             if (Math.Abs(horizontalMouseDelta) >= mouseDeltaThreshold)
             {
-                MoveSelection(horizontalMouseDelta < 0 ? highlightedIndex + 1 : highlightedIndex - 1);
+                MoveSelection(horizontalMouseDelta < 0);
                 horizontalMouseDelta = 0;
             }
         }
@@ -62,9 +67,21 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
             Instance = null;
         }
 
-        private void MoveSelection(int newIndex)
+        private void MoveSelection(bool right)
+        {
+            int newIndex = highlightedIndex + (right ? 1 : -1);
+            MoveSelection(newIndex, right);
+        }
+        private void MoveSelection(int newIndex, bool right)
         {
             if (newIndex < 0 || newIndex >= availableHacks.Count || highlightedIndex == newIndex) return;
+
+            var cost = QuickhackMenuOption.Costs[availableHacks[newIndex].type];
+            if (cost > RamMenu.AvailableRam)
+            {
+                MoveSelection(newIndex + (right ? 1 : -1), right);
+                return;
+            }
 
             SetSelection(newIndex);
         }
@@ -81,6 +98,8 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
 
         public static void AddQuickhack(QuickhackMenuOption.QuickhackType type)
         {
+            if (Instance == null) return;
+
             var prefab = Assets.QuickHacks[type];
             var menuOption = Instantiate(prefab, Instance.transform).GetComponent<QuickhackMenuOption>();
             Instance.availableHacks.Add(menuOption);
@@ -88,6 +107,8 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
 
         public static void RemoveQuickhack(QuickhackMenuOption.QuickhackType type)
         {
+            if (Instance == null) return;
+
             var menuOption = Instance.availableHacks.Where(qh => qh.type == type).FirstOrDefault();
             if (!menuOption) return;
 
@@ -106,7 +127,14 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
             Active = true;
             Instance.player.data.input.silencedInput = true;
 
-            Instance.SetSelection(0);
+            int index = Instance.availableHacks.FindIndex(qh => QuickhackMenuOption.Costs[qh.type] <= RamMenu.AvailableRam);
+            if (index < 0)
+            {
+                Hide();
+                return;
+            }
+
+            Instance.SetSelection(index);
             Instance.gameObject.SetActive(Active);
         }
 
@@ -118,22 +146,39 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
             Instance.horizontalMouseDelta = 0;
             Instance.gameObject.SetActive(Active);
         }
-    }
 
-    public class MouseDeltaTracker : MonoBehaviour
-    {
-        private Vector3 lastPosition;
-        private Vector3 delta;
-
-        private void Update()
+        private static void OnPlayerSelected(Player target, QuickhackMenuOption.QuickhackType quickhackType)
         {
-            delta = lastPosition - Input.mousePosition;
-            lastPosition = Input.mousePosition;
+            if (target.data.dead) return;
+
+            if (!RamMenu.SpendRam(QuickhackMenuOption.Costs[quickhackType])) return;
+
+            NetworkingManager.RPC(typeof(QuickhackMenu), nameof(RPC_ShowPlayerSelectedEffect), target.playerID, quickhackType);
+
+            switch (quickhackType)
+            {
+                case QuickhackMenuOption.QuickhackType.CONTAGION:
+                    ContagionCard.DoQuickHack(target);
+                    break;
+                case QuickhackMenuOption.QuickhackType.SHORT_CIRCUIT:
+                    ShortCircuitCard.DoQuickHack(target);
+                    break;
+                case QuickhackMenuOption.QuickhackType.BURNOUT:
+                    BurnoutCard.DoQuickHack(target);
+                    break;
+                case QuickhackMenuOption.QuickhackType.HAMPER:
+                    HamperCard.DoQuickHack(target);
+                    break;
+            }
         }
 
-        public Vector3 GetDelta()
+        [UnboundRPC]
+        public static void RPC_ShowPlayerSelectedEffect(int playerId, QuickhackMenuOption.QuickhackType quickhackType)
         {
-            return delta;
+            var player = PlayerManager.instance.players.Where(p => p.playerID == playerId).First();
+            var prefab = Assets.QuickhackSelectionEffects[quickhackType];
+
+            Instantiate(prefab).AddComponent<FollowTarget>().Initialize(player.transform, prefab.transform.position);
         }
     }
 }

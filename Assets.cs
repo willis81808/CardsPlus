@@ -29,6 +29,15 @@ namespace CardsPlusPlugin
         public static GameObject HotPotatoArt = Bundle.LoadAsset<GameObject>("C_HotPotato");
         public static GameObject SmokeGrenadeArt = Bundle.LoadAsset<GameObject>("C_SmokeGrenade");
         public static GameObject AdwareArt = Bundle.LoadAsset<GameObject>("C_Adware");
+        public static GameObject ShortCircuitArt = Bundle.LoadAsset<GameObject>("C_ShortCircuit").AddComponent<CyberCardEffect>().gameObject;
+        public static GameObject HamperArt = Bundle.LoadAsset<GameObject>("C_Hamper").AddComponent<CyberCardEffect>().gameObject;
+        public static GameObject ContagionArt = Bundle.LoadAsset<GameObject>("C_Contagion").AddComponent<CyberCardEffect>().gameObject;
+        public static GameObject BurnoutArt = Bundle.LoadAsset<GameObject>("C_Burnout").AddComponent<CyberCardEffect>().gameObject;
+
+        /*
+         * Frames
+         */
+        public static GameObject ElectricFrame = Bundle.LoadAsset<GameObject>("Short Circuit Frame");
 
         /*
          * CARD ASSETS
@@ -70,6 +79,7 @@ namespace CardsPlusPlugin
             .AddComponent<PhotonMagicInitializer>().gameObject;
 
         // Cyberpunk
+        public static TMPro.TMP_FontAsset CyberFont = Bundle.LoadAsset<TMPro.TMP_FontAsset>("CyberwayRiders-lg97d");
         public static GameObject QuickhackMenu = Bundle.LoadAsset<GameObject>("Quickhack Menu");
         public static Dictionary<QuickhackMenuOption.QuickhackType, GameObject> QuickHacks = new Dictionary<QuickhackMenuOption.QuickhackType, GameObject>
         {
@@ -78,10 +88,28 @@ namespace CardsPlusPlugin
             { QuickhackMenuOption.QuickhackType.BURNOUT,        Bundle.LoadAsset<GameObject>("Burnout") },
             { QuickhackMenuOption.QuickhackType.HAMPER,         Bundle.LoadAsset<GameObject>("Hamper") }
         };
+        public static Dictionary<QuickhackMenuOption.QuickhackType, GameObject> QuickhackSelectors = new Dictionary<QuickhackMenuOption.QuickhackType, GameObject>
+        {
+            { QuickhackMenuOption.QuickhackType.CONTAGION,      Bundle.LoadAsset<GameObject>("ContagionSelector") },
+            { QuickhackMenuOption.QuickhackType.SHORT_CIRCUIT,  Bundle.LoadAsset<GameObject>("ShortCircuitSelector") },
+            { QuickhackMenuOption.QuickhackType.BURNOUT,        Bundle.LoadAsset<GameObject>("OverheatSelector") },
+            { QuickhackMenuOption.QuickhackType.HAMPER,         Bundle.LoadAsset<GameObject>("HamperSelector") }
+        };
+        public static Dictionary<QuickhackMenuOption.QuickhackType, GameObject> QuickhackSelectionEffects = new Dictionary<QuickhackMenuOption.QuickhackType, GameObject>
+        {
+            { QuickhackMenuOption.QuickhackType.CONTAGION,      Bundle.LoadAsset<GameObject>("ContagionExplosion") },
+            { QuickhackMenuOption.QuickhackType.SHORT_CIRCUIT,  Bundle.LoadAsset<GameObject>("ShortCircuitExplosion") },
+            { QuickhackMenuOption.QuickhackType.BURNOUT,        Bundle.LoadAsset<GameObject>("OverheatExplosion") },
+            { QuickhackMenuOption.QuickhackType.HAMPER,         Bundle.LoadAsset<GameObject>("HamperExplosion") }
+        };
+        public static GameObject RamMenu = Bundle.LoadAsset<GameObject>("RAM Menu");
+        public static GameObject RamSlot = Bundle.LoadAsset<GameObject>("RAM Slot");
 
         static Assets()
         {
             GameObject.DontDestroyOnLoad(SnakeSpawner);
+            GameObject.DontDestroyOnLoad(BurnoutArt);
+            GameObject.DontDestroyOnLoad(ContagionArt);
 
             var snakeView = SnakePrefab.GetComponent<PhotonView>();
             snakeView.GetComponent<NetworkPhysicsObject>().sendFreq = 2;

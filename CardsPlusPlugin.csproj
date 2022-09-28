@@ -48,6 +48,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>A:\Program Files\SteamLibrary\steamapps\common\ROUNDS\BepInEx\plugins\Unbound\MMHOOK_Assembly-CSharp.dll</HintPath>
     </Reference>
+    <Reference Include="ModdingUtils">
+      <HintPath>..\Libs\ModdingUtils.dll</HintPath>
+    </Reference>
     <Reference Include="Photon3Unity3D">
       <HintPath>A:\Program Files\SteamLibrary\steamapps\common\ROUNDS\Rounds_Data\Managed\Photon3Unity3D.dll</HintPath>
     </Reference>
@@ -114,10 +117,12 @@
     <Compile Include="Cards\AdwareCard.cs" />
     <Compile Include="Cards\Cyberpunk\BurnoutCard.cs" />
     <Compile Include="Cards\Cyberpunk\ContagionCard.cs" />
+    <Compile Include="Cards\Cyberpunk\CyberCardEffect.cs" />
     <Compile Include="Cards\Cyberpunk\CyberpunkHandler.cs" />
     <Compile Include="Cards\Cyberpunk\HamperCard.cs" />
     <Compile Include="Cards\Cyberpunk\QuickhackMenu.cs" />
     <Compile Include="Cards\Cyberpunk\QuickhackMenuOption.cs" />
+    <Compile Include="Cards\Cyberpunk\RamMenu.cs" />
     <Compile Include="Cards\Cyberpunk\ShortCircuitCard.cs" />
     <Compile Include="Cards\ExcaliburCard.cs" />
     <Compile Include="Cards\FragmentCard.cs" />
@@ -134,6 +139,9 @@
     <Compile Include="Cards\TurtleCard.cs" />
     <Compile Include="PhotonMagicInitializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\FollowTarget.cs" />
+    <Compile Include="Utils\MouseDeltaTracker.cs" />
+    <Compile Include="Utils\PlayerSelector.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="AssetsEmbedded\cardsplusart" />

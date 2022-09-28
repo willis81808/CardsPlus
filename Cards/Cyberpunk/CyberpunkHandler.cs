@@ -16,24 +16,22 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
             {
                 Instantiate(Assets.QuickhackMenu, Unbound.Instance.canvas.transform);
             }
+            if (RamMenu.Instance == null)
+            {
+                Instantiate(Assets.RamMenu, Unbound.Instance.canvas.transform);
+            }
         }
 
         private void Update()
         {
-            if (QuickhackMenu.Instance == null)
-            {
-                print("Cannot find Quickhack Menu...");
-                return;
-            }
-
-            if (!Input.GetKeyDown(KeyCode.Q)) return;
-
-            QuickhackMenu.Toggle();
+            if (Input.GetKeyDown(KeyCode.Q)) QuickhackMenu.Toggle();
+            if (Input.GetKeyDown(KeyCode.Escape)) QuickhackMenu.Hide();
         }
 
         private void OnDestroy()
         {
             Destroy(QuickhackMenu.Instance.gameObject);
+            Destroy(RamMenu.Instance.gameObject);
         }
     }
 }
