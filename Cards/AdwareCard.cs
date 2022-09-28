@@ -14,6 +14,7 @@ using Photon.Pun;
 using System.Collections;
 using UnityEngine.EventSystems;
 using CardsPlusPlugin.Utils;
+using ModdingUtils.AIMinion.Extensions;
 
 namespace CardsPlusPlugin.Cards
 {
@@ -61,6 +62,8 @@ namespace CardsPlusPlugin.Cards
         private bool ready = false;
         private bool cooling = false;
 
+        private Coroutine coolingRoutine;
+
         private void Awake()
         {
             player = GetComponent<Player>();
@@ -73,6 +76,7 @@ namespace CardsPlusPlugin.Cards
         private void Start()
         {
             player.data.healthHandler.reviveAction += Reset;
+            Reset();
         }
 
         private void Update()
@@ -93,9 +97,18 @@ namespace CardsPlusPlugin.Cards
         private void Reset()
         {
             PlayerSelector.Clear();
-            visuals.CooldownValue = 1;
             ready = false;
-            cooling = false;
+            cooling = true;
+            visuals.CooldownValue = 0;
+            StartCooldown();
+        }
+
+        public static void ResetCooldown()
+        {
+            foreach (var handler in FindObjectsOfType<AdwareHandler>())
+            {
+                handler.Reset();
+            }
         }
 
         private void ToggleReady()
@@ -128,25 +141,31 @@ namespace CardsPlusPlugin.Cards
             });
 
             cooling = true;
-            StartCoroutine(visuals.CooldownCoroutine(COOLDOWN, () => cooling = false));
+            StartCooldown();
+        }
+
+        private void StartCooldown()
+        {
+            if (coolingRoutine != null) StopCoroutine(coolingRoutine);
+            coolingRoutine = StartCoroutine(visuals.CooldownCoroutine(COOLDOWN, () => cooling = false));
         }
         
         [UnboundRPC]
         private static void RPC_ShowHackedFeedback(int playerId)
         {
             var target = PlayerManager.instance.players.Where(p => p.playerID == playerId).FirstOrDefault();
-            Instantiate(Assets.HackedTargetEffect, target.transform);
+            var prefab = Assets.HackedTargetEffect;
+            Instantiate(prefab).AddComponent<FollowTarget>().Initialize(target.transform, prefab.transform.position);
         }
 
         [UnboundRPC]
         private static void RPC_CreatePopups(int count, int playerId)
         {
-            int myPlayerId = PlayerManager.instance.players
-                .Where(p => p.data.view.IsMine)
-                .Select(p => p.playerID)
+            var myPlayer = PlayerManager.instance.players
+                .Where(p => p.playerID == playerId)
                 .FirstOrDefault();
 
-            if (myPlayerId != playerId) return;
+            if (!myPlayer || !myPlayer.data.view.IsMine) return;
 
             for (int i = 0; i < count; i++)
             {
@@ -207,7 +226,6 @@ namespace CardsPlusPlugin.Cards
         [PunRPC]
         public void RPC_SetValue(float value)
         {
-
             cooldownIndicator.value = value;
             cooldownIndicator.gameObject.SetActive(value < 1);
         }
@@ -215,7 +233,7 @@ namespace CardsPlusPlugin.Cards
 
     public class AdwarePopup : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
-        private static Player player => PlayerManager.instance.players.Where(p => p.data.view.IsMine).FirstOrDefault();
+        private static Player player => PlayerManager.instance.players.Where(p => p.data.view.IsMine && !p.data.GetAdditionalData().isAIMinion).FirstOrDefault();
         private static Canvas canvas => Unbound.Instance.canvas;
 
         private static int titlesCounter = 0, contentsCounter = 0;
@@ -242,6 +260,20 @@ namespace CardsPlusPlugin.Cards
         {
             RandomizeTitle();
             RandomizeContents();
+            PlayerManager.instance.AddPlayerDiedAction(OnPlayerDeath);
+        }
+
+        private void OnDestroy()
+        {
+            PlayerManager.instance.RemovePlayerDiedAction(OnPlayerDeath);
+            print("Removing popup");
+        }
+
+        private void OnPlayerDeath(Player deadPlayer, int deadPlayersCount)
+        {
+            if (player.playerID != deadPlayer.playerID || this == null) return;
+
+            Close();
         }
 
         private void RandomizeTitle()

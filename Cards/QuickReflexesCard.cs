@@ -8,6 +8,7 @@ using HarmonyLib;
 using UnboundLib.Cards;
 using UnityEngine;
 using Photon.Pun;
+using ModdingUtils.AIMinion.Extensions;
 
 namespace CardsPlusPlugin.Cards
 {
@@ -119,7 +120,8 @@ namespace CardsPlusPlugin.Cards
                 if (healthHandler.GetComponent<QuickReflexesEffect>() != null && block.counter >= block.Cooldown())
                 {
                     wasBlocked = true;
-                    if (healthHandler.GetComponent<CharacterData>().view.IsMine) { block.TryBlock(); }
+                    var data = healthHandler.GetComponent<CharacterData>();
+                    if (data.view.IsMine && !data.GetAdditionalData().isAIMinion) { block.TryBlock(); }
                 }
             }
         }

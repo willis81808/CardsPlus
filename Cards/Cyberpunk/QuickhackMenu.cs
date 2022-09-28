@@ -9,6 +9,7 @@ using TMPro;
 using UnboundLib.Networking;
 using UnboundLib;
 using CardsPlusPlugin.Utils;
+using ModdingUtils.AIMinion.Extensions;
 
 namespace CardsPlusPlugin.Cards.Cyberpunk
 {
@@ -35,8 +36,27 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
             Instance = this;
 
             mouseData = gameObject.AddComponent<MouseDeltaTracker>();
-            player = PlayerManager.instance.players.Where(p => p.data.view.IsMine).First();
+            player = PlayerManager.instance.players.Where(p => p.data.view.IsMine && !p.data.GetAdditionalData().isAIMinion).First();
 
+            Hide();
+        }
+
+        private void Start()
+        {
+            PlayerManager.instance.AddPlayerDiedAction(OnPlayerDeath);
+        }
+
+        private void OnDestroy()
+        {
+            Instance = null;
+            PlayerManager.instance.RemovePlayerDiedAction(OnPlayerDeath);
+        }
+
+        private void OnPlayerDeath(Player deadPlayer, int deadPlayersCount)
+        {
+            if (player.playerID != deadPlayer.playerID) return;
+
+            PlayerSelector.Clear();
             Hide();
         }
 
@@ -60,11 +80,6 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
                 MoveSelection(horizontalMouseDelta < 0);
                 horizontalMouseDelta = 0;
             }
-        }
-
-        private void OnDestroy()
-        {
-            Instance = null;
         }
 
         private void MoveSelection(bool right)

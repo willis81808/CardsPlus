@@ -1,4 +1,5 @@
-﻿using ModdingUtils.AIMinion.Extensions;
+﻿using CardsPlusPlugin.Utils;
+using ModdingUtils.AIMinion.Extensions;
 using Photon.Pun;
 using System;
 using System.Collections;
@@ -51,6 +52,11 @@ namespace CardsPlusPlugin.Cards
 
         private bool primed;
 
+        private void OnDestroy()
+        {
+            Remove(false);
+        }
+
         public void Initialize(Player player, Gun gun, Block block)
         {
             this.player = player;
@@ -61,12 +67,12 @@ namespace CardsPlusPlugin.Cards
             block.BlockAction += Block;
         }
 
-        public void Remove()
+        public void Remove(bool destroy = true)
         {
             gun.ShootPojectileAction -= Attack;
             block.BlockAction -= Block;
 
-            Destroy(this);
+            if (destroy) Destroy(this);
         }
 
         private void Attack(GameObject projectile)
@@ -120,6 +126,7 @@ namespace CardsPlusPlugin.Cards
         private ParticleSystem particles;
         private CanvasGroup smokeEffect;
 
+        private Player activePlayer;
         private float maxIntensity = 0f;
         private bool active = true;
 
@@ -127,32 +134,46 @@ namespace CardsPlusPlugin.Cards
         {
             particles = GetComponent<ParticleSystem>();
             smokeEffect = Instantiate(Assets.SmokeEffect, canvas.transform).GetComponent<CanvasGroup>();
+
+            activePlayer = (from p in PlayerManager.instance.players
+                            where p.data.view.IsMine && !p.data.GetAdditionalData().isAIMinion
+                            select p).FirstOrDefault();
+
+            if (!activePlayer)
+            {
+                Remove();
+                return;
+            }
+
+
         }
 
         private void Start()
         {
             StartCoroutine(FadeInOut());
+            PlayerManager.instance.AddPlayerDiedAction(OnPlayerDeath);
+        }
+
+        private void OnDestroy()
+        {
+            PlayerManager.instance.RemovePlayerDiedAction(OnPlayerDeath);
+        }
+
+        private void OnPlayerDeath(Player deadPlayer, int deadPlayersCount)
+        {
+            if (activePlayer.playerID != deadPlayer.playerID) return;
+
+            Remove();
         }
 
         private void Update()
         {
             if (!active) return;
 
-            var players = from p in PlayerManager.instance.players
-                          where p.data.view.IsMine && !p.data.GetAdditionalData().isAIMinion
-                          let distance = Vector3.Distance(p.transform.position, transform.position)
-                          where distance < RANGE
-                          select new
-                          {
-                              Player = p,
-                              Scalar = 1 - (distance / RANGE)
-                          };
+            var distanceScalar = 1 - (Vector3.Distance(activePlayer.transform.position, transform.position) / RANGE);
+            smokeEffect.alpha = maxIntensity * Math.Max(0, Math.Min(1, distanceScalar * 1.5f));
 
-            var target = players.FirstOrDefault();
-
-            smokeEffect.alpha = target == null ? 0 : maxIntensity * Math.Max(0, Math.Min(1, target.Scalar * 1.5f));
-
-            if (target.Player.data.dead) Remove();
+            if (activePlayer.data.dead) Remove();
         }
 
         private IEnumerator FadeInOut()
@@ -179,13 +200,15 @@ namespace CardsPlusPlugin.Cards
             Remove();
         }
 
-        public void Remove()
+        public void Remove(float fullDestroyAfter = 5f)
         {
+            if (!active) return;
+
             StopAllCoroutines();
             active = false;
             particles.Stop();
             Destroy(smokeEffect.gameObject);
-            Destroy(gameObject, 5f);
+            Destroy(gameObject, fullDestroyAfter);
         }
     }
 }

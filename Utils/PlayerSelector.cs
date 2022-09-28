@@ -32,6 +32,13 @@ namespace CardsPlusPlugin.Utils
         private void Remove()
         {
             active = false;
+
+            if (!gameObject.activeInHierarchy)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
             GetComponent<ParticleSystem>()?.Stop();
             Destroy(gameObject, 5f);
         }
