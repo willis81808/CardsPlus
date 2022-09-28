@@ -13,6 +13,7 @@ using UnityEngine.UI;
 using Photon.Pun;
 using System.Collections;
 using UnityEngine.EventSystems;
+using CardsPlusPlugin.Utils;
 
 namespace CardsPlusPlugin.Cards
 {
@@ -107,7 +108,7 @@ namespace CardsPlusPlugin.Cards
             }
             else
             {
-                PlayerSelector.Instantiate(OnPlayerSelected);
+                PlayerSelector.Instantiate(Assets.PlayerSelector, OnPlayerSelected);
             }
 
             ready = !ready;
@@ -212,56 +213,6 @@ namespace CardsPlusPlugin.Cards
         }
     }
 
-    public class PlayerSelector : MonoBehaviour
-    {
-        private static List<PlayerSelector> selectors = new List<PlayerSelector>();
-        
-        public event Action<Player> OnPlayerClicked;
-
-        private bool active = true;
-
-        public void OnMouseDown()
-        {
-            if (!active) return;
-
-            var player = GetComponentInParent<Player>();
-            OnPlayerClicked?.Invoke(player);
-        }
-
-        private void Remove()
-        {
-            active = false;
-            GetComponent<ParticleSystem>().Stop();
-            Destroy(gameObject, 5f);
-        }
-
-        public static void Clear()
-        {
-            for (int i = 0; i < selectors.Count; i++)
-            {
-                selectors[i].Remove();
-            }
-            selectors.Clear();
-        }
-
-        public static void Instantiate(Action<Player> selectedCallback)
-        {
-            int teamId = PlayerManager.instance.players
-                .Where(p => p.data.view.IsMine)
-                .Select(p => p.teamID)
-                .FirstOrDefault();
-
-            foreach (var player in PlayerManager.instance.players)
-            {
-                //if (player.teamID == teamId) continue;
-
-                var selector = Instantiate(Assets.PlayerSelector, player.transform).GetComponent<PlayerSelector>();
-                selector.OnPlayerClicked += selectedCallback;
-                selectors.Add(selector);
-            }
-        }
-    }
-
     public class AdwarePopup : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         private static Player player => PlayerManager.instance.players.Where(p => p.data.view.IsMine).FirstOrDefault();
@@ -296,13 +247,11 @@ namespace CardsPlusPlugin.Cards
         private void RandomizeTitle()
         {
             titleText.text = popupTitles[titlesCounter++ % popupTitles.Length];
-            //titleText.text = popupTitles[Random.Range(0, popupTitles.Length)];
         }
         
         private void RandomizeContents()
         {
             var prefab = Assets.PopupContents[contentsCounter++ % Assets.PopupContents.Length];
-            //var prefab = Assets.PopupContents[Random.Range(0, Assets.PopupContents.Length)];
             Instantiate(prefab, contentContainer);
         }
 

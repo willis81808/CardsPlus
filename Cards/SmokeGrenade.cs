@@ -1,4 +1,5 @@
-﻿using Photon.Pun;
+﻿using ModdingUtils.AIMinion.Extensions;
+using Photon.Pun;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -138,7 +139,7 @@ namespace CardsPlusPlugin.Cards
             if (!active) return;
 
             var players = from p in PlayerManager.instance.players
-                          where p.data.view.IsMine
+                          where p.data.view.IsMine && !p.data.GetAdditionalData().isAIMinion
                           let distance = Vector3.Distance(p.transform.position, transform.position)
                           where distance < RANGE
                           select new
@@ -148,7 +149,10 @@ namespace CardsPlusPlugin.Cards
                           };
 
             var target = players.FirstOrDefault();
+
             smokeEffect.alpha = target == null ? 0 : maxIntensity * Math.Max(0, Math.Min(1, target.Scalar * 1.5f));
+
+            if (target.Player.data.dead) Remove();
         }
 
         private IEnumerator FadeInOut()
@@ -175,8 +179,9 @@ namespace CardsPlusPlugin.Cards
             Remove();
         }
 
-        private void Remove()
+        public void Remove()
         {
+            StopAllCoroutines();
             active = false;
             particles.Stop();
             Destroy(smokeEffect.gameObject);
