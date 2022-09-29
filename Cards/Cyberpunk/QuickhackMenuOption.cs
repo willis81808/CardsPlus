@@ -13,7 +13,7 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
     {
         public static Dictionary<QuickhackType, int> Costs = new Dictionary<QuickhackType, int>
         {
-            { QuickhackType.CONTAGION, 3 },
+            { QuickhackType.CONTAGION, 4 },
             { QuickhackType.SHORT_CIRCUIT, 2 },
             { QuickhackType.BURNOUT, 3 },
             { QuickhackType.HAMPER, 2 }
