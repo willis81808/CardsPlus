@@ -102,10 +102,13 @@ namespace CardsPlusPlugin.Cards
     public class SnakeFollow : MonoBehaviour
     {
         internal static int snakeCount = 0;
-        internal static readonly int maxSnakeCount = 20;
+        internal static readonly int maxSnakeCount = 10;
 
         private Rigidbody2D rb;
         private PhotonView view;
+
+        private DamagableEvent damagable;
+        private CustomHealthBar customHealthBar;
 
         private Vector2 velocity, velRef;
 
@@ -114,7 +117,7 @@ namespace CardsPlusPlugin.Cards
         private float smoothStrength = 0.35f;
         private float maxSpeed = 20;
         private float damageScale = 1f;
-        private float maxHp = 60;
+        private float maxHp = 75;
         
         public Transform target;
 
@@ -124,6 +127,9 @@ namespace CardsPlusPlugin.Cards
         {
             rb = GetComponent<Rigidbody2D>();
             view = GetComponent<PhotonView>();
+
+            damagable = gameObject.AddComponent<DamagableEvent>();
+            customHealthBar = gameObject.AddComponent<CustomHealthBar>();
 
             rb.isKinematic = false;
             rb.mass = 2000f;
@@ -150,12 +156,20 @@ namespace CardsPlusPlugin.Cards
             transform.localScale = Vector3.one;
 
             // destroy self when damaged too much
-            var damagable = gameObject.AddComponent<DamagableEvent>();
             damagable.currentHP = maxHp;
             damagable.maxHP = maxHp;
             damagable.deathEvent = new UnityEvent();
-            damagable.damageEvent = new UnityEvent();
             damagable.deathEvent.AddListener(OnDeath);
+            damagable.damageEvent = new UnityEvent();
+            damagable.damageEvent.AddListener(OnDamage);
+
+            // setup health bar
+            customHealthBar.Initialize(() => damagable.currentHP, () => damagable.maxHP);
+        }
+
+        private void OnDamage()
+        {
+            customHealthBar.OnTakeDamage(Vector2.zero, false);
         }
 
         private void OnDeath()

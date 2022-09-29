@@ -15,6 +15,12 @@ namespace CardsPlusPlugin
         private static readonly AssetBundle Bundle = Jotunn.Utils.AssetUtils.LoadAssetBundleFromResources("cardsplusart", typeof(CardsPlus).Assembly);
 
         /*
+         * BASE GAME
+         */
+        public static GameObject BasePlayer = Resources.Load<GameObject>("Player");
+        public static HealthBar BaseHealthBar = BasePlayer.GetComponentInChildren<HealthBar>();
+
+        /*
          * CARD ART
          */
         public static GameObject TurtleArt = Bundle.LoadAsset<GameObject>("C_TheTurtle");
@@ -35,7 +41,7 @@ namespace CardsPlusPlugin
         public static GameObject BurnoutArt;
 
         /*
-         * Frames
+         * FRAMES
          */
         public static GameObject ElectricFrame;
 
