@@ -99,7 +99,7 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
 
     public class RamSlot : MonoBehaviour
     {
-        private static float refillTime = 5f;
+        private static float refillTime = 3f;
 
         public bool Active { get; private set; }
         public float Progress => fillMeter.value;
