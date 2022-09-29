@@ -21,7 +21,7 @@ using CardsPlusPlugin.Utils;
 namespace CardsPlusPlugin
 {
     [BepInDependency("com.willis.rounds.unbound", BepInDependency.DependencyFlags.HardDependency)]
-    [BepInPlugin(ModId, ModName, "1.6.2")]
+    [BepInPlugin(ModId, ModName, "1.6.3")]
     [BepInProcess("Rounds.exe")]
     public class CardsPlus : BaseUnityPlugin
     {
