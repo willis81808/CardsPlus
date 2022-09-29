@@ -143,6 +143,7 @@
     <Compile Include="Utils\FollowTarget.cs" />
     <Compile Include="Utils\MouseDeltaTracker.cs" />
     <Compile Include="Utils\PlayerSelector.cs" />
+    <Compile Include="Utils\TrailPolygonCollider.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="AssetsEmbedded\cardsplusart" />

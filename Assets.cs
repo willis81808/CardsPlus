@@ -24,31 +24,30 @@ namespace CardsPlusPlugin
         public static GameObject PhantomArt = Bundle.LoadAsset<GameObject>("C_Phantom");
         public static GameObject QuickReflexesArt = Bundle.LoadAsset<GameObject>("C_QuickReflexes");
         public static GameObject LowGravityArt = Bundle.LoadAsset<GameObject>("C_LowGravity");
-        public static GameObject SnakeAttackArt = Bundle.LoadAsset<GameObject>("C_SnakeAttack");
+        public static GameObject SnakeAttackArt;
         public static GameObject ExcaliburArt = Bundle.LoadAsset<GameObject>("C_Excalibur");
-        public static GameObject HotPotatoArt = Bundle.LoadAsset<GameObject>("C_HotPotato");
+        public static GameObject HotPotatoArt;
         public static GameObject SmokeGrenadeArt = Bundle.LoadAsset<GameObject>("C_SmokeGrenade");
         public static GameObject AdwareArt = Bundle.LoadAsset<GameObject>("C_Adware");
-        public static GameObject ShortCircuitArt = Bundle.LoadAsset<GameObject>("C_ShortCircuit").AddComponent<CyberCardEffect>().gameObject;
-        public static GameObject HamperArt = Bundle.LoadAsset<GameObject>("C_Hamper").AddComponent<CyberCardEffect>().gameObject;
-        public static GameObject ContagionArt = Bundle.LoadAsset<GameObject>("C_Contagion").AddComponent<CyberCardEffect>().gameObject;
-        public static GameObject BurnoutArt = Bundle.LoadAsset<GameObject>("C_Burnout").AddComponent<CyberCardEffect>().gameObject;
+        public static GameObject ShortCircuitArt;
+        public static GameObject HamperArt;
+        public static GameObject ContagionArt;
+        public static GameObject BurnoutArt;
 
         /*
          * Frames
          */
-        public static GameObject ElectricFrame = Bundle.LoadAsset<GameObject>("Short Circuit Frame");
+        public static GameObject ElectricFrame;
 
         /*
          * CARD ASSETS
          */
 
         // Snake attack
-        public static GameObject SnakePrefab = Bundle.LoadAsset<GameObject>("Snake").AddComponent<Cards.SnakeFollow>().gameObject.AddComponent<PhotonView>().gameObject.AddComponent<NetworkPhysicsObject>().gameObject;
-        public static GameObject SnakeSpawner = new GameObject("Snake Spawner").AddComponent<Cards.SnakeSpawner>().gameObject;
+        public static GameObject SnakePrefab = Bundle.LoadAsset<GameObject>("Snake").AddComponent<SnakeFollow>().gameObject.AddComponent<PhotonView>().gameObject.AddComponent<NetworkPhysicsObject>().gameObject;
 
         // Excalibur
-        public static GameObject SwordPrefab = Bundle.LoadAsset<GameObject>("Sword").AddComponent<Cards.SwordBehaviour>().gameObject;
+        public static GameObject SwordPrefab = Bundle.LoadAsset<GameObject>("Sword").AddComponent<SwordBehaviour>().gameObject;
         public static GameObject SwordExplosion = Bundle.LoadAsset<GameObject>("ProtonExplosionYellow");
 
         // Hot potato
@@ -107,17 +106,43 @@ namespace CardsPlusPlugin
 
         static Assets()
         {
-            GameObject.DontDestroyOnLoad(SnakeSpawner);
-            GameObject.DontDestroyOnLoad(BurnoutArt);
-            GameObject.DontDestroyOnLoad(ContagionArt);
+            LoadLargeAssets();
 
             var snakeView = SnakePrefab.GetComponent<PhotonView>();
-            snakeView.GetComponent<NetworkPhysicsObject>().sendFreq = 2;
             snakeView.Synchronization = ViewSynchronization.UnreliableOnChange;
             snakeView.OwnershipTransfer = OwnershipOption.Takeover;
             snakeView.observableSearch = PhotonView.ObservableSearch.AutoFindAll;
+            var snakePhysics = snakeView.GetComponent<NetworkPhysicsObject>();
+            snakePhysics.sendFreq = 2;
+            snakePhysics.collisionThreshold = float.PositiveInfinity;
+            snakePhysics.playerColThreshold = float.PositiveInfinity;
+            snakePhysics.shakeAmount = 0;
+            snakePhysics.bulletPushMultiplier = 10;
+            snakePhysics.dmgAmount = 0;
+            snakePhysics.forceAmount = 0;
 
             SwordPrefab.GetComponent<SwordBehaviour>().destroyParticles = SwordExplosion;
+        }
+
+        private static void LoadLargeAssets()
+        {
+            LoadAsync<GameObject>("C_SnakeAttack", result => SnakeAttackArt = result);
+            LoadAsync<GameObject>("C_HotPotato", result => HotPotatoArt = result);
+            LoadAsync<GameObject>("Short Circuit Frame", result => ElectricFrame = result);
+            LoadAsync<GameObject>("C_ShortCircuit", result => ShortCircuitArt = result.AddComponent<CyberCardEffect>().gameObject);
+            LoadAsync<GameObject>("C_Hamper", result => HamperArt = result.AddComponent<CyberCardEffect>().gameObject);
+            LoadAsync<GameObject>("C_Contagion", result => ContagionArt = result.AddComponent<CyberCardEffect>().gameObject);
+            LoadAsync<GameObject>("C_Burnout", result => BurnoutArt = result.AddComponent<CyberCardEffect>().gameObject);
+        }
+
+        private static void LoadAsync<T>(string assetName, Action<T> callback) where T : UnityEngine.Object
+        {
+            //Bundle.LoadAssetWithSubAssetsAsync<T>(assetName)
+            var async = Bundle.LoadAssetWithSubAssetsAsync<T>(assetName);
+            async.completed += operation =>
+            {
+                callback?.Invoke((T)async.asset);
+            };
         }
     }
 }

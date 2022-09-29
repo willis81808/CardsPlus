@@ -22,12 +22,16 @@ namespace CardsPlusPlugin.Cards
 
         public override void OnAddCard(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)
         {
+            if (!player.data.view.IsMine) return;
+
             var launcher = player.gameObject.AddComponent<SmokeLauncher>();
             launcher.Initialize(player, gun, block);
         }
 
         public override void OnRemoveCard(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)
         {
+            if (!player.data.view.IsMine) return;
+
             var launcher = player.gameObject.GetComponent<SmokeLauncher>();
             if (launcher)
             {

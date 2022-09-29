@@ -21,7 +21,7 @@ using CardsPlusPlugin.Utils;
 namespace CardsPlusPlugin
 {
     [BepInDependency("com.willis.rounds.unbound", BepInDependency.DependencyFlags.HardDependency)]
-    [BepInPlugin(ModId, ModName, "1.6.1")]
+    [BepInPlugin(ModId, ModName, "1.6.2")]
     [BepInProcess("Rounds.exe")]
     public class CardsPlus : BaseUnityPlugin
     {
@@ -89,7 +89,7 @@ namespace CardsPlusPlugin
 
         IEnumerator SetupPoint(IGameModeHandler gm)
         {
-            RamMenu.Empty();
+            //RamMenu.Empty();
             AdwareHandler.ResetCooldown();
             yield break;
         }
@@ -98,6 +98,7 @@ namespace CardsPlusPlugin
         {
             DestroyAll<PhantomEffect>();
             DestroyAll<QuickReflexesEffect>();
+            DestroyAll<SnakeShooter>();
             DestroyAll<SwordSpawner>();
             DestroyAll<HotPotatoEffect>();
             DestroyAll<SmokeLauncher>();

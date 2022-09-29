@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CardsPlusPlugin.Utils;
 using Photon.Pun;
 using UnboundLib;
 using UnboundLib.Cards;
@@ -17,87 +18,87 @@ namespace CardsPlusPlugin.Cards
     {
         public override void SetupCard(CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers)
         {
-            gun.objectsToSpawn = new ObjectsToSpawn[]
+            cardInfo.allowMultiple = false;
+        }
+
+        public override void OnAddCard(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)
+        {
+            if (!player.data.view.IsMine) return;
+
+            var spawner = player.gameObject.GetOrAddComponent<SnakeShooter>();
+            spawner.Initialize(gun);
+        }
+
+        public override void OnRemoveCard(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)
+        {
+            if (!player.data.view.IsMine) return;
+
+            var spawner = player.gameObject.GetComponent<SnakeShooter>();
+            if (spawner)
             {
-                new ObjectsToSpawn()
-                {
-                    effect = Assets.SnakeSpawner,
-                    spawnAsChild = false,
-                    scaleFromDamage = 1,
-                    scaleStackM = 1,
-                    scaleStacks = false,
-                    numberOfSpawns = 1,
-                    spawnOn = ObjectsToSpawn.SpawnOn.all,
-                    direction = ObjectsToSpawn.Direction.normal
-                }
-            };
+                spawner.Remove();
+            }
         }
 
-        public override void OnAddCard(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats) { }
+        public override string GetModName() => "Cards+";
+        protected override string GetTitle() => "Snake Attack";
+        protected override string GetDescription() => "Snakes... Why did it have to be snakes??";
+        protected override CardInfoStat[] GetStats() => null;
+        protected override CardInfo.Rarity GetRarity() => CardInfo.Rarity.Uncommon;
+        protected override GameObject GetCardArt() => Assets.SnakeAttackArt;
+        protected override CardThemeColor.CardThemeColorType GetTheme() => CardThemeColor.CardThemeColorType.PoisonGreen;
+    }
 
-        public override void OnRemoveCard() { }
+    public class SnakeShooter : MonoBehaviour
+    {
+        private Gun gun;
 
-        public override string GetModName()
+        public void Initialize(Gun gun)
         {
-            return "Cards+";
+            this.gun = gun;
+            gun.ShootPojectileAction += Attack;
         }
 
-        protected override string GetTitle()
+        private void Attack(GameObject projectile)
         {
-            return "Snake Attack";
+            var spawnedAttack = projectile.GetComponent<SpawnedAttack>();
+            if (!spawnedAttack) return;
+            projectile.AddComponent<SnakeSpawner>();
         }
 
-        protected override string GetDescription()
+        public void Remove(bool destroy = true)
         {
-            return "Snakes... Why did it have to be snakes??";
+            gun.ShootPojectileAction -= Attack;
+            if (destroy) Destroy(this);
         }
 
-        protected override CardInfoStat[] GetStats()
+        private void OnDestroy()
         {
-            return null;
-        }
-
-        protected override CardInfo.Rarity GetRarity()
-        {
-            return CardInfo.Rarity.Uncommon;
-        }
-
-        protected override GameObject GetCardArt()
-        {
-            return Assets.SnakeAttackArt;
-        }
-
-        protected override CardThemeColor.CardThemeColorType GetTheme()
-        {
-            return CardThemeColor.CardThemeColorType.PoisonGreen;
+            Remove(false);
         }
     }
 
-    public class SnakeSpawner : MonoBehaviour
+    public class SnakeSpawner : RayHitEffect
     {
-        private static bool Initialized = false;
+        private bool done;
 
-        void Start()
+        public override HasToReturn DoHitEffect(HitInfo hit)
         {
-            if (!Initialized)
-            {
-                Initialized = true;
-                return;
-            }
+            if (done || SnakeFollow.maxSnakeCount <= SnakeFollow.snakeCount || (!PhotonNetwork.OfflineMode && !PhotonNetwork.IsMasterClient))
+                return HasToReturn.canContinue;
 
-            Destroy(gameObject, 1f);
+            if (hit.transform.GetComponentInParent<Player>() || hit.transform.GetComponentInParent<SnakeFollow>())
+                return HasToReturn.canContinue;
 
-            if (SnakeFollow.maxSnakeCount <= SnakeFollow.snakeCount || (!PhotonNetwork.OfflineMode && !PhotonNetwork.IsMasterClient)) return;
+            var result = PhotonNetwork.Instantiate(Assets.SnakePrefab.name, transform.position, Assets.SnakePrefab.transform.rotation).GetComponent<SnakeFollow>();
+            result.SetDamageScale(transform.lossyScale.x);
 
-            this.ExecuteAfterSeconds(0.1f, () =>
-            {
-                var result = PhotonNetwork.Instantiate(Assets.SnakePrefab.name, transform.position, transform.rotation).GetComponent<SnakeFollow>();
-                result.SetDamageScale(transform.lossyScale.x);
-            });
+            done = true;
+            return HasToReturn.canContinue;
         }
     }
     
-    [RequireComponent(typeof(Rigidbody2D), typeof(LineRenderer))]
+    [RequireComponent(typeof(Rigidbody2D))]
     public class SnakeFollow : MonoBehaviour
     {
         internal static int snakeCount = 0;
@@ -105,7 +106,6 @@ namespace CardsPlusPlugin.Cards
 
         private Rigidbody2D rb;
         private PhotonView view;
-        private LineRenderer line;
 
         private Vector2 velocity, velRef;
 
@@ -114,6 +114,7 @@ namespace CardsPlusPlugin.Cards
         private float smoothStrength = 0.35f;
         private float maxSpeed = 20;
         private float damageScale = 1f;
+        private float maxHp = 60;
         
         public Transform target;
 
@@ -123,7 +124,10 @@ namespace CardsPlusPlugin.Cards
         {
             rb = GetComponent<Rigidbody2D>();
             view = GetComponent<PhotonView>();
-            line = GetComponent<LineRenderer>();
+
+            rb.isKinematic = false;
+            rb.mass = 2000f;
+            rb.inertia = float.PositiveInfinity;
 
             snakeCount++;
         }
@@ -147,34 +151,32 @@ namespace CardsPlusPlugin.Cards
 
             // destroy self when damaged too much
             var damagable = gameObject.AddComponent<DamagableEvent>();
-            damagable.maxHP = damagable.currentHP = 1;
+            damagable.currentHP = maxHp;
+            damagable.maxHP = maxHp;
             damagable.deathEvent = new UnityEvent();
             damagable.damageEvent = new UnityEvent();
-            damagable.deathEvent.AddListener(() =>
+            damagable.deathEvent.AddListener(OnDeath);
+        }
+
+        private void OnDeath()
+        {
+            Sonigon.SoundManager.Instance.Play(PlayerManager.instance.players[0].data.healthHandler.soundDie, transform);
+
+            DynamicParticles.instance.PlayBulletHit(20 * damageScale, transform, new HitInfo()
             {
-                Sonigon.SoundManager.Instance.Play(PlayerManager.instance.players[0].data.healthHandler.soundDie, transform);
+                collider = null,
+                normal = -rb.velocity.normalized,
+                point = (Vector2)transform.position + rb.velocity.normalized * 0.4f,
+                rigidbody = rb,
+                transform = transform
+            }, Color.green);
 
-                DynamicParticles.instance.PlayBulletHit(20 * damageScale, transform, new HitInfo()
-                {
-                    collider = null,
-                    normal = -rb.velocity.normalized,
-                    point = (Vector2)transform.position + rb.velocity.normalized * 0.4f,
-                    rigidbody = rb,
-                    transform = transform
-                }, Color.green);
-
-                PhotonNetwork.Destroy(gameObject);
-            });
+            Unbound.Instance.ExecuteAfterFrames(1, () => PhotonNetwork.Destroy(gameObject));
         }
 
         private void Update()
         {
             // follow nearest player
-            /*
-            target = (from p in PlayerManager.instance.players
-                      orderby Vector3.Distance(p.transform.position, transform.position)
-                      select p.transform).FirstOrDefault();
-            */
             target = PlayerManager.instance.GetClosestPlayer(transform.position)?.transform;
 
             // check if should deal damage
@@ -229,7 +231,7 @@ namespace CardsPlusPlugin.Cards
         {
             if (transform.childCount == 0) return;
 
-            var head = transform.GetChild(0);
+            var head = transform.Find("Head");
             head.transform.up = rb.velocity;
         }
         
