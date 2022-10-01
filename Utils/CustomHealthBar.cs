@@ -17,13 +17,13 @@ namespace CardsPlusPlugin.Utils
         private HealthBar healthBar;
 
         /// <summary>
-        /// Current health value, clamped to the range <c>[0, MaxHealth</c>]
+        /// Current health value, clamped to the range <c>[0, <see cref="MaxHealth"/>]</c>
         /// </summary>
         public float CurrentHealth { get => _currentHealth; set => SetCurrentHealth(value); }
         private float _currentHealth = 100;
 
         /// <summary>
-        /// Max health value, clamped to the range <c>[0, Infinity]</c>
+        /// Max health value, clamped to the range <c>[0, <see cref="float.PositiveInfinity"/>]</c>
         /// </summary>
         public float MaxHealth { get => _maxHealth; set => SetMaxHealth(value); }
         private float _maxHealth = 100;
