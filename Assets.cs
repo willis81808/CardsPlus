@@ -64,7 +64,7 @@ namespace CardsPlusPlugin
         public static GameObject SmokeEffect = Bundle.LoadAsset<GameObject>("Smoke Effect");
 
         // Adware
-        public static GameObject PlayerSelector = Bundle.LoadAsset<GameObject>("Player Selector");
+        public static GameObject AdwarePlayerSelector = Bundle.LoadAsset<GameObject>("Player Selector");
         public static GameObject PopupPrefab = Bundle.LoadAsset<GameObject>("Popup Window");
         public static GameObject HackedTargetEffect = Bundle.LoadAsset<GameObject>("HackedTargetEffect");
         public static GameObject[] PopupContents = new GameObject[]

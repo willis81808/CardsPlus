@@ -129,7 +129,8 @@ namespace CardsPlusPlugin
                 smokeEffect.Remove(0f);
             }
 
-            PlayerSelector.Clear();
+            AdwareHandler.ClearAdwareSelectors();
+            QuickhackMenu.ClearQuickhackSelectors();
 
             yield break;
         }

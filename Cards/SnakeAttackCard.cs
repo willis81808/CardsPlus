@@ -164,12 +164,12 @@ namespace CardsPlusPlugin.Cards
             damagable.damageEvent.AddListener(OnDamage);
 
             // setup health bar
-            customHealthBar.Initialize(() => damagable.currentHP, () => damagable.maxHP);
+            customHealthBar.SetValues(damagable.currentHP, damagable.maxHP);
         }
 
         private void OnDamage()
         {
-            customHealthBar.OnTakeDamage(Vector2.zero, false);
+            customHealthBar.CurrentHealth = damagable.currentHP;
         }
 
         private void OnDeath()

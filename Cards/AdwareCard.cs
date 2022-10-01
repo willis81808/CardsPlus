@@ -96,7 +96,7 @@ namespace CardsPlusPlugin.Cards
 
         private void Reset()
         {
-            PlayerSelector.Clear();
+            ClearAdwareSelectors();
             ready = false;
             cooling = true;
             visuals.CooldownValue = 0;
@@ -117,11 +117,18 @@ namespace CardsPlusPlugin.Cards
 
             if (ready)
             {
-                PlayerSelector.Clear();
+                ClearAdwareSelectors();
             }
             else
             {
-                PlayerSelector.Instantiate(Assets.PlayerSelector, OnPlayerSelected);
+                if (CardsPlus.allowSelfTargeting.Value)
+                {
+                    PlayerSelector.InstantiateOnAll(Assets.AdwarePlayerSelector, OnPlayerSelected);
+                }
+                else
+                {
+                    PlayerSelector.InstantiateOnEnemies(Assets.AdwarePlayerSelector, OnPlayerSelected);
+                }
             }
 
             ready = !ready;
@@ -150,6 +157,11 @@ namespace CardsPlusPlugin.Cards
             coolingRoutine = StartCoroutine(visuals.CooldownCoroutine(COOLDOWN, () => cooling = false));
         }
         
+        public static void ClearAdwareSelectors()
+        {
+            PlayerSelector.Clear(Assets.AdwarePlayerSelector);
+        }
+
         [UnboundRPC]
         private static void RPC_ShowHackedFeedback(int playerId)
         {
@@ -266,7 +278,6 @@ namespace CardsPlusPlugin.Cards
         private void OnDestroy()
         {
             PlayerManager.instance.RemovePlayerDiedAction(OnPlayerDeath);
-            print("Removing popup");
         }
 
         private void OnPlayerDeath(Player deadPlayer, int deadPlayersCount)

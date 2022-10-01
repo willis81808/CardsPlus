@@ -55,8 +55,8 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
         private void OnPlayerDeath(Player deadPlayer, int deadPlayersCount)
         {
             if (player.playerID != deadPlayer.playerID) return;
-
-            PlayerSelector.Clear();
+            
+            ClearQuickhackSelectors();
             Hide();
         }
 
@@ -67,7 +67,17 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
             if (Input.GetMouseButtonDown(0))
             {
                 var quickHackType = availableHacks[highlightedIndex].type;
-                PlayerSelector.Instantiate(Assets.QuickhackSelectors[quickHackType], (target) => OnPlayerSelected(target, quickHackType));
+
+                ClearQuickhackSelectors();
+
+                if (CardsPlus.allowSelfTargeting.Value)
+                {
+                    PlayerSelector.InstantiateOnAll(Assets.QuickhackSelectors[quickHackType], (target) => OnPlayerSelected(target, quickHackType));
+                }
+                else
+                {
+                    PlayerSelector.InstantiateOnEnemies(Assets.QuickhackSelectors[quickHackType], (target) => OnPlayerSelected(target, quickHackType));
+                }
 
                 Hide();
                 return;
@@ -160,6 +170,14 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
 
             Instance.horizontalMouseDelta = 0;
             Instance.gameObject.SetActive(Active);
+        }
+
+        public static void ClearQuickhackSelectors()
+        {
+            foreach (QuickhackMenuOption.QuickhackType quickhackType in Enum.GetValues(typeof(QuickhackMenuOption.QuickhackType)))
+            {
+                PlayerSelector.Clear(Assets.QuickhackSelectors[quickhackType]);
+            }
         }
 
         private static void OnPlayerSelected(Player target, QuickhackMenuOption.QuickhackType quickhackType)
