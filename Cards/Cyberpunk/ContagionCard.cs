@@ -1,4 +1,4 @@
-﻿using CardsPlusPlugin.Utils;
+﻿using ModsPlus;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,8 +19,8 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
         {
             Title       = "Contagion",
             Description = $"<color=\"purple\">Quickhack</color>\n" +
-                          $"<color=\"red\">{QuickhackMenuOption.Costs[QuickhackMenuOption.QuickhackType.CONTAGION]} RAM</color>\n" +
-                          $"Deal poison damage to target and all players near to them",
+                            $"<color=\"red\">{QuickhackMenuOption.Costs[QuickhackMenuOption.QuickhackType.CONTAGION]} RAM</color>\n" +
+                            $"Deal poison damage to target and all players near to them",
             ModName     = "Cards+",
             Art         = Assets.ContagionArt,
             Rarity      = CardInfo.Rarity.Uncommon,

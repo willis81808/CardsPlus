@@ -1,4 +1,4 @@
-﻿using CardsPlusPlugin.Utils;
+﻿using ModsPlus;
 using ModdingUtils.MonoBehaviours;
 using System;
 using System.Collections;

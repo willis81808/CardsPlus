@@ -14,6 +14,7 @@ using Photon.Pun;
 using System.Collections;
 using UnityEngine.EventSystems;
 using CardsPlusPlugin.Utils;
+using ModsPlus;
 using ModdingUtils.AIMinion.Extensions;
 
 namespace CardsPlusPlugin.Cards

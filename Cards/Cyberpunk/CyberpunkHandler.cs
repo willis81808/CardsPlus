@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnboundLib;
-using CardsPlusPlugin.Utils;
+using ModsPlus;
 
 namespace CardsPlusPlugin.Cards.Cyberpunk
 {

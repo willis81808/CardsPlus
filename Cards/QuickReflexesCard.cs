@@ -9,7 +9,7 @@ using UnboundLib.Cards;
 using UnityEngine;
 using Photon.Pun;
 using ModdingUtils.AIMinion.Extensions;
-using CardsPlusPlugin.Utils;
+using ModsPlus;
 
 namespace CardsPlusPlugin.Cards
 {
