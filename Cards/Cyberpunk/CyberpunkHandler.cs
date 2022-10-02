@@ -5,10 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnboundLib;
+using CardsPlusPlugin.Utils;
 
 namespace CardsPlusPlugin.Cards.Cyberpunk
 {
-    public class CyberpunkHandler : MonoBehaviour
+    public class CyberpunkHandler : CardEffect
     {
         private void Awake()
         {
@@ -28,8 +29,9 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
             if (Input.GetKeyDown(KeyCode.Escape)) QuickhackMenu.Hide();
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             Destroy(QuickhackMenu.Instance.gameObject);
             Destroy(RamMenu.Instance.gameObject);
         }

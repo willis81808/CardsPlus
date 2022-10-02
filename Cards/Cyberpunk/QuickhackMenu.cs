@@ -31,7 +31,7 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
         {
             if (Instance != null && Instance != this)
             {
-                Destroy(Instance.gameObject);
+                DestroyImmediate(Instance.gameObject);
             }
             Instance = this;
 

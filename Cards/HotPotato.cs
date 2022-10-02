@@ -1,4 +1,5 @@
-﻿using Photon.Pun;
+﻿using CardsPlusPlugin.Utils;
+using Photon.Pun;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,41 +11,32 @@ using UnityEngine;
 
 namespace CardsPlusPlugin.Cards
 {
-    public class HotPotato : CustomCard
+    public class HotPotato : CustomEffectCard<HotPotatoEffect>
     {
+        public override CardDetails Details => new CardDetails
+        {
+            Title       = "Hot Potato",
+            Description = "Leave a trail of burning fire in your wake",
+            ModName     = "Cards+",
+            Art         = Assets.HotPotatoArt,
+            Rarity      = CardInfo.Rarity.Uncommon,
+            Theme       = CardThemeColor.CardThemeColorType.DestructiveRed
+        };
+
         public override void SetupCard(CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers)
         {
-            PhotonNetwork.PrefabPool.RegisterPrefab(Assets.FlameArea.name, Assets.FlameArea);
             cardInfo.allowMultiple = false;
         }
-
-        public override void OnAddCard(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)
-        {
-            player.gameObject.AddComponent<HotPotatoEffect>();
-        }
-
-        public override string GetModName() => "Cards+";
-        protected override string GetTitle() => "Hot Potato";
-        protected override string GetDescription() => "Leave a trail of burning fire in your wake";
-        protected override GameObject GetCardArt() => Assets.HotPotatoArt;
-        protected override CardInfo.Rarity GetRarity() => CardInfo.Rarity.Uncommon;
-        protected override CardThemeColor.CardThemeColorType GetTheme() => CardThemeColor.CardThemeColorType.DestructiveRed;
-        protected override CardInfoStat[] GetStats() => null;
     }
 
-    public class HotPotatoEffect : MonoBehaviour
+    public class HotPotatoEffect : CardEffect
     {
         private float spawnDelay = 0.1f;
         private float lifetime = 0.8f;
-        private Player player;
 
-        void Awake()
+        protected override void Start()
         {
-            player = GetComponent<Player>();
-        }
-
-        void Start()
-        {
+            base.Start();
             InvokeRepeating(nameof(SpawnFlame), spawnDelay, spawnDelay);
         }
 

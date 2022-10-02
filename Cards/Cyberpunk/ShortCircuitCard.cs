@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CardsPlusPlugin.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,38 +11,35 @@ using UnityEngine;
 
 namespace CardsPlusPlugin.Cards.Cyberpunk
 {
-    public class ShortCircuitCard : CustomCard
+    public class ShortCircuitCard : CustomEffectCard<CyberpunkHandler>
     {
+        public override CardDetails Details => new CardDetails
+        {
+            Title       = "Short Circuit",
+            Description = $"<color=\"purple\">Quickhack</color>\n" +
+                          $"<color=\"red\">{QuickhackMenuOption.Costs[QuickhackMenuOption.QuickhackType.SHORT_CIRCUIT]} RAM</color>\n" +
+                          $"Stun target for 1 seconds",
+            ModName     = "Cards+",
+            Art         = Assets.ShortCircuitArt,
+            Rarity      = CardInfo.Rarity.Uncommon,
+            Theme       = CardThemeColor.CardThemeColorType.ColdBlue,
+            OwnerOnly   = true
+        };
+
         public override void SetupCard(CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers)
         {
             cardInfo.allowMultiple = false;
         }
 
-        public override void OnAddCard(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)
+        protected override void Added(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)
         {
-            if (!player.data.view.IsMine) return;
-
-            var handler = player.GetComponent<CyberpunkHandler>();
-            if (!handler)
-            {
-                player.gameObject.AddComponent<CyberpunkHandler>();
-            }
-
             Unbound.Instance.ExecuteAfterFrames(1, () => QuickhackMenu.AddQuickhack(QuickhackMenuOption.QuickhackType.SHORT_CIRCUIT));
         }
 
-        public override void OnRemoveCard()
+        protected override void Removed(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)
         {
             QuickhackMenu.RemoveQuickhack(QuickhackMenuOption.QuickhackType.SHORT_CIRCUIT);
         }
-
-        protected override string GetTitle() => "Short Circuit";
-        protected override string GetDescription() => $"<color=\"purple\">Quickhack</color>\n<color=\"red\">{QuickhackMenuOption.Costs[QuickhackMenuOption.QuickhackType.SHORT_CIRCUIT]} RAM</color>\nStun target for 1 seconds";
-        public override string GetModName() => "Cards+";
-        protected override CardInfo.Rarity GetRarity() => CardInfo.Rarity.Uncommon;
-        protected override CardThemeColor.CardThemeColorType GetTheme() => CardThemeColor.CardThemeColorType.DefensiveBlue;
-        protected override CardInfoStat[] GetStats() => null;
-        protected override GameObject GetCardArt() => Assets.ShortCircuitArt;
 
         public static void DoQuickHack(Player target)
         {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CardsPlusPlugin.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,71 +10,17 @@ using UnityEngine;
 
 namespace CardsPlusPlugin.Cards
 {
-    public class ExcaliburCard : CustomCard
+    public class ExcaliburCard : CustomEffectCard<SwordSpawner>
     {
-        public override void OnAddCard(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)
+        public override CardDetails Details => new CardDetails
         {
-            var spawner = player.GetComponent<SwordSpawner>();
-
-            if (spawner != null)
-            {
-                spawner.Upgrade();
-            }
-            else
-            {
-                spawner = player.gameObject.AddComponent<SwordSpawner>();
-            }
-
-            //spawner.target = PlayerManager.instance.GetOtherPlayer(player).transform;
-            spawner.swordPrefab = Assets.SwordPrefab;
-
-            block.BlockAction += (type) =>
-            {
-                spawner.SpawnSword();
-                spawner.SpawnSword();
-                spawner.SpawnSword();
-            };
-        }
-
-        public override void OnRemoveCard()
-        {
-            //throw new NotImplementedException();
-        }
-
-        public override void SetupCard(CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers, Block block)
-        {
-            block.InvokeMethod("ResetStats");
-            block.cdMultiplier = 1.25f;
-        }
-
-        public override string GetModName()
-        {
-            return "Cards+";
-        }
-
-        protected override string GetTitle()
-        {
-            return "Excalibur";
-        }
-
-        protected override string GetDescription()
-        {
-            return "The sword of kings!";
-        }
-
-        protected override GameObject GetCardArt()
-        {
-            return Assets.ExcaliburArt;
-        }
-
-        protected override CardInfo.Rarity GetRarity()
-        {
-            return CardInfo.Rarity.Uncommon;
-        }
-
-        protected override CardInfoStat[] GetStats()
-        {
-            return new CardInfoStat[]
+            Title       = "Excalibur",
+            Description = "The sword of kings!",
+            ModName     = "Cards+",
+            Art         = Assets.ExcaliburArt,
+            Rarity      = CardInfo.Rarity.Uncommon,
+            Theme       = CardThemeColor.CardThemeColorType.FirepowerYellow,
+            Stats = new[]
             {
                 new CardInfoStat()
                 {
@@ -82,12 +29,12 @@ namespace CardsPlusPlugin.Cards
                     amount = "+25%",
                     simepleAmount = CardInfoStat.SimpleAmount.slightlyLower
                 }
-            };
-        }
+            }
+        };
 
-        protected override CardThemeColor.CardThemeColorType GetTheme()
+        public override void SetupCard(CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers, Block block)
         {
-            return CardThemeColor.CardThemeColorType.FirepowerYellow;
+            block.cdMultiplier = 1.25f;
         }
     }
     
@@ -196,9 +143,9 @@ namespace CardsPlusPlugin.Cards
         }
     }
     
-    public class SwordSpawner : MonoBehaviour
+    public class SwordSpawner : CardEffect
     {
-        public GameObject swordPrefab;
+        private static readonly GameObject swordPrefab = Assets.SwordPrefab;
 
         public float pointDistance = 2f;
 
@@ -207,6 +154,8 @@ namespace CardsPlusPlugin.Cards
         public float delay = 2f;
 
         private int damage = 75;
+
+        private int swordsToSpawn = 3;
 
         private int spawnMax = 6;
 
@@ -241,16 +190,24 @@ namespace CardsPlusPlugin.Cards
             targetPointHolder.transform.SetParent(transform);
         }
 
-        void Start()
+        protected override void Start()
         {
+            base.Start();
             StartInvoke(delay);
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            CancelInvoke();
+            Clear();
         }
 
         public void StartInvoke(float delay)
         {
             CancelInvoke();
             this.delay = delay;
-            InvokeRepeating("Fire", delay, delay);
+            InvokeRepeating(nameof(Fire), delay, delay);
         }
 
         void Update()
@@ -266,11 +223,14 @@ namespace CardsPlusPlugin.Cards
             }
         }
 
-        public void Upgrade()
+        public override void OnUpgradeCard()
         {
             // fire faster
             delay /= 2;
             StartInvoke(delay);
+
+            // double swords to spawn on block
+            swordsToSpawn *= 2;
 
             // increase max sword count
             spawnMax *= 2;
@@ -286,6 +246,14 @@ namespace CardsPlusPlugin.Cards
 
             // increase sword size
             scaleDelta += 0.2f;
+        }
+
+        public override void OnBlock(BlockTrigger.BlockTriggerType blockTriggerType)
+        {
+            for (int i = 0; i < swordsToSpawn; i++)
+            {
+                SpawnSword();
+            }
         }
 
         void Fire()

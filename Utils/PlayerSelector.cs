@@ -117,7 +117,7 @@ namespace CardsPlusPlugin.Utils
         {
             if (selectorPrefab == null)
             {
-                CardsPlus.GetLogger().LogError($"[PlayerSelector] Selector prefab cannot  be null!");
+                CardsPlus.LOGGER.LogError($"[PlayerSelector] Selector prefab cannot  be null!");
                 return;
             }
 
@@ -125,7 +125,7 @@ namespace CardsPlusPlugin.Utils
 
             if (selectorPrefab.GetComponentInChildren<PlayerSelector>() == null)
             {
-                CardsPlus.GetLogger().LogError($"[PlayerSelector] The selector prefab provided ({selectorPrefab.name}) does not contain an instance of PlayerSelector!");
+                CardsPlus.LOGGER.LogError($"[PlayerSelector] The selector prefab provided ({selectorPrefab.name}) does not contain an instance of PlayerSelector!");
                 return;
             }
 

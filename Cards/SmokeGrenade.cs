@@ -13,73 +13,30 @@ using UnityEngine;
 
 namespace CardsPlusPlugin.Cards
 {
-    public class SmokeGrenade : CustomCard
+    public class SmokeGrenade : CustomEffectCard<SmokeLauncher>
     {
+        public override CardDetails Details => new CardDetails
+        {
+            Title       = "Smoke Grenade",
+            Description = "Your first bullet fired after locking releases a blinding smoke",
+            ModName     = "Cards+",
+            Art         = Assets.SmokeGrenadeArt,
+            Rarity      = CardInfo.Rarity.Common,
+            Theme       = CardThemeColor.CardThemeColorType.TechWhite,
+            OwnerOnly   = true
+        };
+
         public override void SetupCard(CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers, Block block)
         {
             cardInfo.allowMultiple = false;
         }
-
-        public override void OnAddCard(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)
-        {
-            if (!player.data.view.IsMine) return;
-
-            var launcher = player.gameObject.AddComponent<SmokeLauncher>();
-            launcher.Initialize(player, gun, block);
-        }
-
-        public override void OnRemoveCard(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)
-        {
-            if (!player.data.view.IsMine) return;
-
-            var launcher = player.gameObject.GetComponent<SmokeLauncher>();
-            if (launcher)
-            {
-                launcher.Remove();
-            }
-        }
-
-        protected override string GetTitle() => "Smoke Grenade";
-        protected override string GetDescription() => "Your first bullet fired after blocking releases a blinding smoke";
-        public override string GetModName() => "Cards+";
-        protected override CardThemeColor.CardThemeColorType GetTheme() => CardThemeColor.CardThemeColorType.TechWhite;
-        protected override CardInfo.Rarity GetRarity() => CardInfo.Rarity.Common;
-        protected override GameObject GetCardArt() => Assets.SmokeGrenadeArt;
-        protected override CardInfoStat[] GetStats() => null;
     }
 
-    public class SmokeLauncher : MonoBehaviour
+    public class SmokeLauncher : CardEffect
     {
-        private Player player;
-        private Gun gun;
-        private Block block;
-
         private bool primed;
 
-        private void OnDestroy()
-        {
-            Remove(false);
-        }
-
-        public void Initialize(Player player, Gun gun, Block block)
-        {
-            this.player = player;
-            this.gun = gun;
-            this.block = block;
-
-            gun.ShootPojectileAction += Attack;
-            block.BlockAction += Block;
-        }
-
-        public void Remove(bool destroy = true)
-        {
-            gun.ShootPojectileAction -= Attack;
-            block.BlockAction -= Block;
-
-            if (destroy) Destroy(this);
-        }
-
-        private void Attack(GameObject projectile)
+        public override void OnShoot(GameObject projectile)
         {
             var spawnedAttack = projectile.GetComponent<SpawnedAttack>();
             if (!spawnedAttack || !primed) return;
@@ -90,7 +47,7 @@ namespace CardsPlusPlugin.Cards
             primed = false;
         }
 
-        private void Block(BlockTrigger.BlockTriggerType trigger)
+        public override void OnBlock(BlockTrigger.BlockTriggerType trigger)
         {
             switch (trigger)
             {

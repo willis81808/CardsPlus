@@ -18,64 +18,45 @@ using ModdingUtils.AIMinion.Extensions;
 
 namespace CardsPlusPlugin.Cards
 {
-    public class AdwareCard : CustomCard
+    public class AdwareCard : CustomEffectCard<AdwareHandler>
     {
+        public override CardDetails Details => new CardDetails
+        {
+            Title       = "Adware",
+            Description = "Press <color=\"purple\">F</color> to enter <color=\"red\">Hacker Mode</color>! When you select a target they'll be bombarded with annoying popup advertisements",
+            ModName     = "Cards+",
+            Art         = Assets.AdwareArt,
+            Rarity      = CardInfo.Rarity.Uncommon,
+            Theme       = CardThemeColor.CardThemeColorType.EvilPurple,
+            OwnerOnly   = true
+        };
+
         public override void SetupCard(CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers)
         {
             cardInfo.allowMultiple = false;
         }
-
-        public override void OnAddCard(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)
-        {
-            if (!player.data.view.IsMine) return;
-
-            player.gameObject.AddComponent<AdwareHandler>();
-        }
-
-        public override void OnRemoveCard(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)
-        {
-            if (!player.data.view.IsMine) return;
-
-            var adwareHandler = player.gameObject.GetComponent<AdwareHandler>();
-            if (adwareHandler)
-            {
-                Destroy(adwareHandler);
-            }
-        }
-
-        protected override string GetTitle() => "Adware";
-        protected override string GetDescription() => "Press <color=\"purple\">F</color> to enter <color=\"red\">Hacker Mode</color>! When you select a target they'll be bombarded with annoying popup advertisements";
-        public override string GetModName() => "Cards+";
-        protected override CardInfo.Rarity GetRarity() => CardInfo.Rarity.Uncommon;
-        protected override CardThemeColor.CardThemeColorType GetTheme() => CardThemeColor.CardThemeColorType.EvilPurple;
-        protected override GameObject GetCardArt() => Assets.AdwareArt;
-        protected override CardInfoStat[] GetStats() => null;
     }
 
-    public class AdwareHandler : MonoBehaviour
+    public class AdwareHandler : CardEffect
     {
         private const float COOLDOWN = 15f;
         private const int AD_COUNT = 5;
 
-        private Player player;
         private AdwarePlayerCanvas visuals;
         private bool ready = false;
         private bool cooling = false;
 
         private Coroutine coolingRoutine;
 
-        private void Awake()
+        protected override void Start()
         {
-            player = GetComponent<Player>();
+            base.Start();
 
+            // create Adware UI
             var data = new object[] { player.playerID };
             var visualsObj = PhotonNetwork.Instantiate(Assets.AdwareCanvas.name, transform.position, Quaternion.identity, data: data);
             visuals = visualsObj.GetComponent<AdwarePlayerCanvas>();
-        }
 
-        private void Start()
-        {
-            player.data.healthHandler.reviveAction += Reset;
             Reset();
         }
 
@@ -87,11 +68,16 @@ namespace CardsPlusPlugin.Cards
             }
         }
         
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
-            player.data.healthHandler.reviveAction -= Reset;
+            base.OnDestroy();
             if (ready) ToggleReady();
             PhotonNetwork.Destroy(visuals.GetComponent<PhotonView>());
+        }
+
+        public override void OnRevive()
+        {
+            Reset();
         }
 
         private void Reset()

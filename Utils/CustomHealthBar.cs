@@ -125,7 +125,7 @@ namespace CardsPlusPlugin.Utils
 
             if (startIndex < 0 || endIndex < 0)
             {
-                CardsPlus.GetLogger().LogError($"[HealthBar] Update transpiler unable to find code block to replace");
+                CardsPlus.LOGGER.LogError($"[HealthBar] Update transpiler unable to find code block to replace");
                 return code;
             }
 
@@ -164,7 +164,7 @@ namespace CardsPlusPlugin.Utils
 
             if (insertIndex == -1)
             {
-                CardsPlus.GetLogger().LogError($"[HealthBar] Start transpiler unable to find call to 'GetComponentInParent<CharacterStatModifiers>'");
+                CardsPlus.LOGGER.LogError($"[HealthBar] Start transpiler unable to find call to 'GetComponentInParent<CharacterStatModifiers>'");
                 return code;
             }
 

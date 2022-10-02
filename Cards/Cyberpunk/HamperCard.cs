@@ -1,4 +1,5 @@
-﻿using ModdingUtils.MonoBehaviours;
+﻿using CardsPlusPlugin.Utils;
+using ModdingUtils.MonoBehaviours;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,38 +13,35 @@ using UnityEngine;
 
 namespace CardsPlusPlugin.Cards.Cyberpunk
 {
-    public class HamperCard : CustomCard
+    public class HamperCard : CustomEffectCard<CyberpunkHandler>
     {
+        public override CardDetails Details => new CardDetails
+        {
+            Title       = "Hamper",
+            Description = $"<color=\"purple\">Quickhack</color>\n" +
+                          $"<color=\"red\">{QuickhackMenuOption.Costs[QuickhackMenuOption.QuickhackType.HAMPER]} RAM</color>\n" +
+                          $"Half your target's movement speed for 5 seconds",
+            ModName     = "Cards+",
+            Art         = Assets.HamperArt,
+            Rarity      = CardInfo.Rarity.Uncommon,
+            Theme       = CardThemeColor.CardThemeColorType.FirepowerYellow,
+            OwnerOnly   = true
+        };
+
         public override void SetupCard(CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers)
         {
             cardInfo.allowMultiple = false;
         }
 
-        public override void OnAddCard(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)
+        protected override void Added(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)
         {
-            if (!player.data.view.IsMine) return;
-
-            var handler = player.GetComponent<CyberpunkHandler>();
-            if (!handler)
-            {
-                player.gameObject.AddComponent<CyberpunkHandler>();
-            }
-
             Unbound.Instance.ExecuteAfterFrames(1, () => QuickhackMenu.AddQuickhack(QuickhackMenuOption.QuickhackType.HAMPER));
         }
 
-        public override void OnRemoveCard()
+        protected override void Removed(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)
         {
             QuickhackMenu.RemoveQuickhack(QuickhackMenuOption.QuickhackType.HAMPER);
         }
-
-        protected override string GetTitle() => "Hamper";
-        protected override string GetDescription() => $"<color=\"purple\">Quickhack</color>\n<color=\"red\">{QuickhackMenuOption.Costs[QuickhackMenuOption.QuickhackType.HAMPER]} RAM</color>\nHalf your target's movement speed for 5 seconds";
-        public override string GetModName() => "Cards+";
-        protected override CardInfo.Rarity GetRarity() => CardInfo.Rarity.Uncommon;
-        protected override CardThemeColor.CardThemeColorType GetTheme() => CardThemeColor.CardThemeColorType.FirepowerYellow;
-        protected override CardInfoStat[] GetStats() => null;
-        protected override GameObject GetCardArt() => Assets.HamperArt;
 
         public static void DoQuickHack(Player target)
         {

@@ -14,67 +14,32 @@ using UnityEngine.Events;
 
 namespace CardsPlusPlugin.Cards
 {
-    public class SnakeAttackCard : CustomCard
+    public class SnakeAttackCard : CustomEffectCard<SnakeShooter>
     {
+        public override CardDetails Details => new CardDetails
+        {
+            Title       = "Snake Attack",
+            Description = "Snakes... Why did it have to be snakes??",
+            ModName     = "Cards+",
+            Art         = Assets.SnakeAttackArt,
+            Rarity      = CardInfo.Rarity.Uncommon,
+            Theme       = CardThemeColor.CardThemeColorType.PoisonGreen,
+            OwnerOnly   = true
+        };
+
         public override void SetupCard(CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers)
         {
             cardInfo.allowMultiple = false;
         }
-
-        public override void OnAddCard(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)
-        {
-            if (!player.data.view.IsMine) return;
-
-            var spawner = player.gameObject.GetOrAddComponent<SnakeShooter>();
-            spawner.Initialize(gun);
-        }
-
-        public override void OnRemoveCard(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)
-        {
-            if (!player.data.view.IsMine) return;
-
-            var spawner = player.gameObject.GetComponent<SnakeShooter>();
-            if (spawner)
-            {
-                spawner.Remove();
-            }
-        }
-
-        public override string GetModName() => "Cards+";
-        protected override string GetTitle() => "Snake Attack";
-        protected override string GetDescription() => "Snakes... Why did it have to be snakes??";
-        protected override CardInfoStat[] GetStats() => null;
-        protected override CardInfo.Rarity GetRarity() => CardInfo.Rarity.Uncommon;
-        protected override GameObject GetCardArt() => Assets.SnakeAttackArt;
-        protected override CardThemeColor.CardThemeColorType GetTheme() => CardThemeColor.CardThemeColorType.PoisonGreen;
     }
 
-    public class SnakeShooter : MonoBehaviour
+    public class SnakeShooter : CardEffect
     {
-        private Gun gun;
-
-        public void Initialize(Gun gun)
-        {
-            this.gun = gun;
-            gun.ShootPojectileAction += Attack;
-        }
-
-        private void Attack(GameObject projectile)
+        public override void OnShoot(GameObject projectile)
         {
             var spawnedAttack = projectile.GetComponent<SpawnedAttack>();
             if (!spawnedAttack) return;
             projectile.AddComponent<SnakeSpawner>();
-        }
-
-        public void Remove(bool destroy = true)
-        {
-            gun.ShootPojectileAction -= Attack;
-            if (destroy) Destroy(this);
-        }
-
-        private void OnDestroy()
-        {
-            Remove(false);
         }
     }
 

@@ -9,47 +9,21 @@ using UnboundLib.Cards;
 using UnityEngine;
 using Photon.Pun;
 using ModdingUtils.AIMinion.Extensions;
+using CardsPlusPlugin.Utils;
 
 namespace CardsPlusPlugin.Cards
 {
-    public class QuickReflexesCard : CustomCard
+    public class QuickReflexesCard : CustomEffectCard<QuickReflexesEffect>
     {
-        public override void SetupCard(CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers, Block block)
+        public override CardDetails Details => new CardDetails
         {
-            cardInfo.allowMultiple = false;
-            block.InvokeMethod("ResetStats");
-            block.cdAdd = 2f;
-        }
-        public override void OnAddCard(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)
-        {
-            player.gameObject.AddComponent<QuickReflexesEffect>();
-        }
-        public override void OnRemoveCard() { }
-
-        public override string GetModName()
-        {
-            return "Cards+";
-        }
-
-        protected override string GetTitle()
-        {
-            return "Quick Reflexes";
-        }
-        protected override string GetDescription()
-        {
-            return "Automatically block bullets";
-        }
-        protected override GameObject GetCardArt()
-        {
-            return Assets.QuickReflexesArt;
-        }
-        protected override CardInfo.Rarity GetRarity()
-        {
-            return CardInfo.Rarity.Rare;
-        }
-        protected override CardInfoStat[] GetStats()
-        {
-            return new CardInfoStat[]
+            Title       = "QuickReflexes",
+            Description = "Automatically block bullets",
+            ModName     = "Cards+",
+            Art         = Assets.QuickReflexesArt,
+            Rarity      = CardInfo.Rarity.Rare,
+            Theme       = CardThemeColor.CardThemeColorType.DefensiveBlue,
+            Stats = new []
             {
                 new CardInfoStat()
                 {
@@ -58,22 +32,21 @@ namespace CardsPlusPlugin.Cards
                     simepleAmount = CardInfoStat.SimpleAmount.notAssigned,
                     stat = "Block cooldown"
                 }
-            };
-        }
-        protected override CardThemeColor.CardThemeColorType GetTheme()
+            }
+        };
+
+        public override void SetupCard(CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers, Block block)
         {
-            return CardThemeColor.CardThemeColorType.DefensiveBlue;
+            cardInfo.allowMultiple = false;
+            block.cdAdd = 2f;
         }
     }
 
-    public class QuickReflexesEffect : MonoBehaviour
+    public class QuickReflexesEffect : CardEffect
     {
         // blank mono which just marks the player as being able to autoblock
     }
 
-    // Necessary patches:
-    // these patches were not running previously when put inside QuickReflexesEffect
-    // organizing them this way causes them to run properly
     [HarmonyPatch(typeof(Block), "ResetStats")]
     class BlockPatchResetStats
     {

@@ -25,6 +25,7 @@ namespace CardsPlusPlugin
     [BepInProcess("Rounds.exe")]
     public class CardsPlus : BaseUnityPlugin
     {
+        public static ManualLogSource LOGGER { get => Instance.Logger; }
         private static CardsPlus Instance { get; set; }
         private const string ModId = "com.willis.rounds.cardsplus";
         private const string ModName = "Cards Plus";
@@ -70,11 +71,6 @@ namespace CardsPlusPlugin
             CustomCard.BuildCard<HamperCard>();
         }
 
-        public static ManualLogSource GetLogger()
-        {
-            return Instance.Logger;
-        }
-
         private void SetupMenu(GameObject menu)
         {
             MenuHandler.CreateToggle(allowSelfTargeting.Value, "Allow Self Targeting with Adware/Quickhacks", menu, val => allowSelfTargeting.Value = val, 30, true);
@@ -83,6 +79,7 @@ namespace CardsPlusPlugin
         private void RegisterPrefabs()
         {
             PhotonNetwork.PrefabPool.RegisterPrefab(Assets.SnakePrefab.name, Assets.SnakePrefab);
+            PhotonNetwork.PrefabPool.RegisterPrefab(Assets.FlameArea.name, Assets.FlameArea);
             PhotonNetwork.PrefabPool.RegisterPrefab(Assets.SmokeObject.name, Assets.SmokeObject);
             PhotonNetwork.PrefabPool.RegisterPrefab(Assets.AdwareCanvas.name, Assets.AdwareCanvas);
         }
