@@ -5,84 +5,45 @@ using UnboundLib;
 using UnboundLib.Networking;
 using System.Collections;
 using HarmonyLib;
+using ModsPlus;
 using CardChoiceSpawnUniqueCardPatch.CustomCategories;
 
 namespace CardsPlusPlugin.Cards
 {
-    public class PhantomCard : CustomCard
+    public class PhantomCard : CustomEffectCard<CardEffect>
     {
-        public override void SetupCard(CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers, Block block)
+        public override CardDetails Details => new CardDetails
         {
-            block.InvokeMethod("ResetStats");
-            block.cdAdd = 3f;
-
-            cardInfo.categories = new CardCategory[] { CustomCardCategories.instance.CardCategory("Phantom") };
-            cardInfo.blacklistedCategories = new CardCategory[] { CustomCardCategories.instance.CardCategory("Ghost") };
-        }
-        public override void OnAddCard(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)
-        {
-            var effect = player.GetComponent<PhantomEffect>();
-            if (effect == null)
-            {
-                effect = player.gameObject.AddComponent<PhantomEffect>();
-            }
-            effect.AddDuration(Math.Max(1f, effect.duration));
-        }
-        public override void OnRemoveCard()
-        {
-            //throw new NotImplementedException();
-        }
-
-        public override string GetModName()
-        {
-            return "Cards+";
-        }
-
-        protected override string GetTitle()
-        {
-            return "Phantom";
-        }
-
-        protected override string GetDescription()
-        {
-            return "Blocking causes you and your bullets to become Ethereal.\nWhile Ethereal, <color=\"red\">-50%</color> Damage";
-        }
-
-        protected override GameObject GetCardArt()
-        {
-            return Assets.PhantomArt;
-        }
-
-        protected override CardInfo.Rarity GetRarity()
-        {
-            return CardInfo.Rarity.Uncommon;
-        }
-
-        protected override CardInfoStat[] GetStats()
-        {
-            return new CardInfoStat[]
+            Title       = "Phantom",
+            Description = "Blocking causes you and your bullets to become Ethereal.\nWhile Ethereal, <color=\"red\">-15%</color> Damage",
+            ModName     = "Cards+",
+            Art         = Assets.PhantomArt,
+            Rarity      = CardInfo.Rarity.Uncommon,
+            Theme       = CardThemeColor.CardThemeColorType.TechWhite,
+            Stats = new []
             {
                 new CardInfoStat()
                 {
                     positive = false,
-                    amount = "3s",
+                    amount = "+2s",
                     simepleAmount = CardInfoStat.SimpleAmount.notAssigned,
                     stat = "Block cooldown"
                 }
-            };
-        }
+            }
+        };
 
-        protected override CardThemeColor.CardThemeColorType GetTheme()
+        public override void SetupCard(CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers, Block block)
         {
-            return CardThemeColor.CardThemeColorType.TechWhite;
+            block.InvokeMethod("ResetStats");
+            block.cdAdd = 2f;
+
+            cardInfo.categories = new CardCategory[] { CustomCardCategories.instance.CardCategory("Phantom") };
+            cardInfo.blacklistedCategories = new CardCategory[] { CustomCardCategories.instance.CardCategory("Ghost") };
         }
     }
 
-    [HarmonyPatch]
-    public class PhantomEffect : MonoBehaviour
+    public class PhantomEffect : CardEffect
     {
-        private Player player;
-
         private float startTime = float.MaxValue;
 
         public float duration = 0f;
@@ -99,16 +60,17 @@ namespace CardsPlusPlugin.Cards
 
         void Awake()
         {
-            player = GetComponent<Player>();
             playerColors = GetComponentsInChildren<SetTeamColor>();
             particles = GetComponentsInChildren<PlayerSkinParticle>();
             colliders = GetComponentsInChildren<Collider2D>();
         }
-        void Start()
+        protected override void Start()
         {
+            base.Start();
             projectileColor = player.data.weaponHandler.gun.projectileColor;
             damageOriginal = player.data.weaponHandler.gun.damage;
         }
+
         void Update()
         {
             if (!active) return;
@@ -117,6 +79,17 @@ namespace CardsPlusPlugin.Cards
                 active = false;
                 EndEffect();
             }
+        }
+
+        public override void OnBlock(BlockTrigger.BlockTriggerType blockTriggerType)
+        {
+            if (blockTriggerType != BlockTrigger.BlockTriggerType.Default) return;
+            StartEffect();
+        }
+
+        public override void OnUpgradeCard()
+        {
+            AddDuration(Math.Max(1f, duration));
         }
 
         void StartEffect()
@@ -170,13 +143,14 @@ namespace CardsPlusPlugin.Cards
 
             g.ignoreWalls = true;
             g.projectileColor = Color.white;
-            g.damage = damageOriginal * 0.5f;
+            g.damage = damageOriginal * 0.85f;
             
             foreach (var c in colliders)
             {
                 c.enabled = false;
             }
         }
+
         void EndEffect()
         {
             var p = player;
@@ -216,29 +190,10 @@ namespace CardsPlusPlugin.Cards
         {
             startTime = Time.time;
         }
+
         public void AddDuration(float duration)
         {
             this.duration += duration;
-        }
-
-        [HarmonyPatch(typeof(Block), "RPCA_DoBlock")]
-        [HarmonyPostfix]
-        static void Block_PostFix(Block __instance, bool firstBlock, bool dontSetCD, BlockTrigger.BlockTriggerType triggerType, Vector3 useBlockPos, bool onlyBlockEffects)
-        {
-            var phantomEffect = __instance.GetComponent<PhantomEffect>();
-            if ( (phantomEffect == null) || (triggerType != BlockTrigger.BlockTriggerType.Default) ) return;
-            phantomEffect.StartEffect();
-        }
-
-        [HarmonyPatch(typeof(Block), "ResetStats")]
-        [HarmonyPostfix]
-        static void ResetStats_PostFix(Block __instance)
-        {
-            var phantomEffect = __instance.GetComponent<PhantomEffect>();
-            if (phantomEffect != null)
-            {
-                Destroy(phantomEffect);
-            }
         }
     }
 }

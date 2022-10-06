@@ -23,7 +23,8 @@ namespace CardsPlusPlugin
     [BepInDependency("com.willis.rounds.unbound", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("pykess.rounds.plugins.moddingutils", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("com.willis.rounds.modsplus", BepInDependency.DependencyFlags.HardDependency)]
-    [BepInPlugin(ModId, ModName, "1.6.6")]
+    [BepInDependency("root.classes.manager.reborn", BepInDependency.DependencyFlags.HardDependency)]
+    [BepInPlugin(ModId, ModName, "1.7.1")]
     [BepInProcess("Rounds.exe")]
     public class CardsPlus : BaseUnityPlugin
     {
@@ -39,6 +40,8 @@ namespace CardsPlusPlugin
         {
             Instance = this;
 
+            Assets.OnFinishedLoadingAssets += OnAssetsLoaded;
+
             var harmony = new Harmony(ModId);
             harmony.PatchAll();
 
@@ -46,31 +49,19 @@ namespace CardsPlusPlugin
             GameModeManager.AddHook(GameModeHooks.HookRoundEnd, ResetRound);
             GameModeManager.AddHook(GameModeHooks.HookPointEnd, ResetRound);
             GameModeManager.AddHook(GameModeHooks.HookPointStart, SetupPoint);
+        }
 
+        private void OnAssetsLoaded()
+        {
+            LOGGER.LogInfo("ASSETS DONE LOADING, REGISTER CARDS");
             RegisterPrefabs();
+            RegisterCards();
         }
 
         void Start()
         {
             allowSelfTargeting = Config.Bind(CompatabilityModName, "CardsPlus_SelfTargeting", false, "Allow self-targeting with abilities using the player selector");
             Unbound.RegisterMenu(ModName, null, SetupMenu, showInPauseMenu: true);
-
-            CustomCard.BuildCard<HareCard>();
-            CustomCard.BuildCard<TurtleCard>();
-            CustomCard.BuildCard<TerminatorCard>();
-            CustomCard.BuildCard<SlowPokeCard>();
-            CustomCard.BuildCard<PhantomCard>();
-            CustomCard.BuildCard<QuickReflexesCard>();
-            CustomCard.BuildCard<LowGravityCard>();
-            CustomCard.BuildCard<SnakeAttackCard>();
-            CustomCard.BuildCard<ExcaliburCard>();
-            CustomCard.BuildCard<HotPotato>();
-            CustomCard.BuildCard<SmokeGrenade>();
-            CustomCard.BuildCard<AdwareCard>();
-            CustomCard.BuildCard<ContagionCard>();
-            CustomCard.BuildCard<ShortCircuitCard>();
-            CustomCard.BuildCard<BurnoutCard>();
-            CustomCard.BuildCard<HamperCard>();
         }
 
         private void SetupMenu(GameObject menu)
@@ -84,6 +75,30 @@ namespace CardsPlusPlugin
             PhotonNetwork.PrefabPool.RegisterPrefab(Assets.FlameArea.name, Assets.FlameArea);
             PhotonNetwork.PrefabPool.RegisterPrefab(Assets.SmokeObject.name, Assets.SmokeObject);
             PhotonNetwork.PrefabPool.RegisterPrefab(Assets.AdwareCanvas.name, Assets.AdwareCanvas);
+        }
+
+        private void RegisterCards()
+        {
+            CardRegistry.RegisterCard<HareCard>();
+            CardRegistry.RegisterCard<TurtleCard>();
+            CardRegistry.RegisterCard<TerminatorCard>();
+            CardRegistry.RegisterCard<SlowPokeCard>();
+            CardRegistry.RegisterCard<PhantomCard>();
+            CardRegistry.RegisterCard<QuickReflexesCard>();
+            CardRegistry.RegisterCard<LowGravityCard>();
+            CardRegistry.RegisterCard<SnakeAttackCard>();
+            CardRegistry.RegisterCard<ExcaliburCard>();
+            CardRegistry.RegisterCard<HotPotato>();
+            CardRegistry.RegisterCard<SmokeGrenade>();
+            CardRegistry.RegisterCard<AdwareCard>();
+
+            CardRegistry.RegisterCard<ContagionCard>();
+            CardRegistry.RegisterCard<ShortCircuitCard>();
+            CardRegistry.RegisterCard<BurnoutCard>();
+            CardRegistry.RegisterCard<HamperCard>();
+            CardRegistry.RegisterCard<RamUpgradeCard>();
+            CardRegistry.RegisterCard<OverclockCard>();
+            CardRegistry.RegisterCard<CyberPsychosisCard>();
         }
 
         IEnumerator SetupPoint(IGameModeHandler gm)
