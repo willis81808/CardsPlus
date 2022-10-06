@@ -49,7 +49,7 @@ namespace CardsPlusPlugin.Cards
 
         public override HasToReturn DoHitEffect(HitInfo hit)
         {
-            if (done || SnakeFollow.maxSnakeCount <= SnakeFollow.snakeCount || (!PhotonNetwork.OfflineMode && !PhotonNetwork.IsMasterClient))
+            if (done || SnakeFollow.maxSnakeCount <= SnakeFollow.snakeCount)
                 return HasToReturn.canContinue;
 
             if (hit.transform.GetComponentInParent<Player>() || hit.transform.GetComponentInParent<SnakeFollow>())
