@@ -16,62 +16,54 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
     {
         public override IEnumerator Init()
         {
-            CardsPlus.LOGGER.LogInfo("[CyberpunkClass] Start registering");
-
             CardInfo
                 shortCircuit = null,
                 hamper = null,
                 burnout = null,
                 contagion = null,
+                rebootOptics = null,
                 ramUpgrade = null,
                 overclock = null,
                 cyberPsychosis = null;
 
-            while (!(shortCircuit && hamper && burnout && contagion && ramUpgrade && overclock && cyberPsychosis))
+            while (!(shortCircuit && hamper && burnout && contagion && rebootOptics && ramUpgrade && overclock && cyberPsychosis))
             {
-                try
-                {
-                    shortCircuit = CardRegistry.GetCard<ShortCircuitCard>();
-                    hamper = CardRegistry.GetCard<HamperCard>();
-                    burnout = CardRegistry.GetCard<BurnoutCard>();
-                    contagion = CardRegistry.GetCard<ContagionCard>();
-                    ramUpgrade = CardRegistry.GetCard<RamUpgradeCard>();
-                    overclock = CardRegistry.GetCard<OverclockCard>();
-                    cyberPsychosis = CardRegistry.GetCard<CyberPsychosisCard>();
-                }
-                catch (Exception e)
-                {
-                    CardsPlus.LOGGER.LogWarning("Part 1");
-                    CardsPlus.LOGGER.LogError(e.Message);
-                    CardsPlus.LOGGER.LogError(e.StackTrace);
-                }
+                shortCircuit = CardRegistry.GetCard<ShortCircuitCard>();
+                hamper = CardRegistry.GetCard<HamperCard>();
+                burnout = CardRegistry.GetCard<BurnoutCard>();
+                contagion = CardRegistry.GetCard<ContagionCard>();
+                rebootOptics = CardRegistry.GetCard<RebootOpticsCard>();
+                ramUpgrade = CardRegistry.GetCard<RamUpgradeCard>();
+                overclock = CardRegistry.GetCard<OverclockCard>();
+                cyberPsychosis = CardRegistry.GetCard<CyberPsychosisCard>();
                 yield return null;
             }
 
-            try
+            // Register quickhacks as entrypoints with each other quickhack whitelisted
+            var quickhacks = new[] { shortCircuit, hamper, burnout, contagion, rebootOptics };
+            RegisterAndWhitelistAll(quickhacks);
+
+            var oneOfAny = ArrayOfElementArrays(quickhacks);
+            ClassesRegistry.Register(ramUpgrade, CardType.Card, oneOfAny, 3);
+            ClassesRegistry.Register(overclock, CardType.Card, oneOfAny, 2);
+
+            ClassesRegistry.Register(cyberPsychosis, CardType.Card, quickhacks);
+        }
+
+        private void RegisterAndWhitelistAll(params CardInfo[] cards)
+        {
+            foreach (var c in cards)
             {
-                // layer one
-                ClassesRegistry.Register(shortCircuit, CardType.NonClassCard | CardType.Entry);
-                ClassesRegistry.Register(hamper, CardType.NonClassCard | CardType.Entry);
-                ClassesRegistry.Register(contagion, CardType.NonClassCard | CardType.Entry);
-                ClassesRegistry.Register(burnout, CardType.NonClassCard | CardType.Entry);
-
-                // require one
-                var layerOne = new[] { shortCircuit, hamper, burnout, contagion };
-                ClassesRegistry.Register(ramUpgrade, CardType.NonClassCard | CardType.Card, ArrayOfElementArrays(layerOne), 3);
-                ClassesRegistry.Register(overclock, CardType.NonClassCard | CardType.Card, ArrayOfElementArrays(layerOne), 2);
-
-                // require all
-                ClassesRegistry.Register(cyberPsychosis, CardType.NonClassCard | CardType.Card, layerOne);
-
-                CardsPlus.LOGGER.LogInfo("[CyberpunkClass] Finished registering");
+                List<CardInfo> others = new List<CardInfo>(cards);
+                others.Remove(c);
+                RegisterWithWhitelist(c, others.ToArray());
             }
-            catch (Exception e)
-            {
-                CardsPlus.LOGGER.LogWarning("Part 2");
-                CardsPlus.LOGGER.LogError(e.Message);
-                CardsPlus.LOGGER.LogError(e.StackTrace);
-            }
+        }
+
+        private void RegisterWithWhitelist(CardInfo source, params CardInfo[] cardsToWhitelist)
+        {
+            var classObj = ClassesRegistry.Register(source, CardType.Entry);
+            foreach (var ci in cardsToWhitelist) classObj.Whitelist(ci);
         }
 
         private CardInfo[][] ArrayOfElementArrays(params CardInfo[] cards)

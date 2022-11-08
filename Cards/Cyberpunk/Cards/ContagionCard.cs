@@ -43,7 +43,7 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
             QuickhackMenu.RemoveQuickhack(QuickhackMenuOption.QuickhackType.CONTAGION);
         }
 
-        public static void DoQuickHack(Player target)
+        public static void DoQuickHack(Player target, Player source)
         {
             var playersInRange = PlayerManager.instance.players
                 .Where(p => Vector3.Distance(p.transform.position, target.transform.position) < RANGE)

@@ -19,6 +19,12 @@ namespace CardsPlusPlugin
         private static AssetBundle Bundle;
 
         //
+        // DEBUG ASSETS
+        //
+        public static GameObject Arrow;
+        public static GameObject TestTurret;
+
+        //
         // CARD ART
         //
         public static GameObject TurtleArt;
@@ -62,6 +68,7 @@ namespace CardsPlusPlugin
         // Cyberpunk
         public static TMPro.TMP_FontAsset CyberFont;
         public static Material GlitchShaderMaterialHolder;
+        public static ScreenBlurEffect ScreenBlurEffect;
         public static GameObject GlitchedParticleEffect;
         public static GameObject ElectricFrame;
         public static GameObject QuickhackMenu;
@@ -117,6 +124,12 @@ namespace CardsPlusPlugin
             CardsPlus.LOGGER.LogInfo("STARTED LOADING BUNDLE");
 
             yield return LoadAssetBundleFromResources(false, "cardsplusart", typeof(CardsPlus).Assembly);
+            var debugBundle = Jotunn.Utils.AssetUtils.LoadAssetBundleFromResources("debugassets", typeof(CardsPlus).Assembly);
+
+            TestTurret = Bundle.LoadAsset<GameObject>("Test Turret");
+
+            Arrow = debugBundle.LoadAsset<GameObject>("Arrow");
+
 
             CardsPlus.LOGGER.LogInfo("FINISHED LOADING BUNDLE");
 
@@ -154,8 +167,8 @@ namespace CardsPlusPlugin
 
             // Excalibur
             SwordPrefab = Bundle.LoadAsset<GameObject>("Sword").AddComponent<SwordBehaviour>().gameObject;
-            SwordPrefab.GetComponent<SwordBehaviour>().destroyParticles = SwordExplosion;
             SwordExplosion = Bundle.LoadAsset<GameObject>("ProtonExplosionYellow");
+            SwordPrefab.GetComponent<SwordBehaviour>().destroyParticles = SwordExplosion;
 
             // Hot potato
             FlameArea = Bundle.LoadAsset<GameObject>("FlameArea").AddComponent<HotPotatoFlame>().gameObject;
@@ -185,6 +198,7 @@ namespace CardsPlusPlugin
                 .AddComponent<PhotonMagicInitializer>().gameObject;
 
             // Cyberpunk
+            ScreenBlurEffect = Bundle.LoadAsset<GameObject>("BlurEffect").GetComponent<ScreenBlurEffect>();
             GlitchedParticleEffect = Bundle.LoadAsset<GameObject>("GlitchedEffect");
             GlitchShaderMaterialHolder = Bundle.LoadAsset<Material>("GlitchMaterial");
             CyberFont = Bundle.LoadAsset<TMPro.TMP_FontAsset>("CyberwayRiders-lg97d");
@@ -194,21 +208,24 @@ namespace CardsPlusPlugin
                 { QuickhackMenuOption.QuickhackType.CONTAGION,      Bundle.LoadAsset<GameObject>("Contagion") },
                 { QuickhackMenuOption.QuickhackType.SHORT_CIRCUIT,  Bundle.LoadAsset<GameObject>("Short Circuit") },
                 { QuickhackMenuOption.QuickhackType.BURNOUT,        Bundle.LoadAsset<GameObject>("Burnout") },
-                { QuickhackMenuOption.QuickhackType.HAMPER,         Bundle.LoadAsset<GameObject>("Hamper") }
+                { QuickhackMenuOption.QuickhackType.HAMPER,         Bundle.LoadAsset<GameObject>("Hamper") },
+                { QuickhackMenuOption.QuickhackType.REBOOT_OPTICS,  Bundle.LoadAsset<GameObject>("Reboot Optics") }
             };
             QuickhackSelectors = new Dictionary<QuickhackMenuOption.QuickhackType, GameObject>
             {
                 { QuickhackMenuOption.QuickhackType.CONTAGION,      Bundle.LoadAsset<GameObject>("ContagionSelector") },
                 { QuickhackMenuOption.QuickhackType.SHORT_CIRCUIT,  Bundle.LoadAsset<GameObject>("ShortCircuitSelector") },
                 { QuickhackMenuOption.QuickhackType.BURNOUT,        Bundle.LoadAsset<GameObject>("OverheatSelector") },
-                { QuickhackMenuOption.QuickhackType.HAMPER,         Bundle.LoadAsset<GameObject>("HamperSelector") }
+                { QuickhackMenuOption.QuickhackType.HAMPER,         Bundle.LoadAsset<GameObject>("HamperSelector") },
+                { QuickhackMenuOption.QuickhackType.REBOOT_OPTICS,  Bundle.LoadAsset<GameObject>("RebootOpticsSelector") }
             };
             QuickhackSelectionEffects = new Dictionary<QuickhackMenuOption.QuickhackType, GameObject>
             {
                 { QuickhackMenuOption.QuickhackType.CONTAGION,      Bundle.LoadAsset<GameObject>("ContagionExplosion") },
                 { QuickhackMenuOption.QuickhackType.SHORT_CIRCUIT,  Bundle.LoadAsset<GameObject>("ShortCircuitExplosion") },
                 { QuickhackMenuOption.QuickhackType.BURNOUT,        Bundle.LoadAsset<GameObject>("OverheatExplosion") },
-                { QuickhackMenuOption.QuickhackType.HAMPER,         Bundle.LoadAsset<GameObject>("HamperExplosion") }
+                { QuickhackMenuOption.QuickhackType.HAMPER,         Bundle.LoadAsset<GameObject>("HamperExplosion") },
+                { QuickhackMenuOption.QuickhackType.REBOOT_OPTICS,  Bundle.LoadAsset<GameObject>("RebootOpticsExplosion") }
             };
             RamMenu = Bundle.LoadAsset<GameObject>("RAM Menu");
             RamSlot = Bundle.LoadAsset<GameObject>("RAM Slot");

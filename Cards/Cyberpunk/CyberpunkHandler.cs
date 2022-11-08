@@ -25,7 +25,8 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Q)) QuickhackMenu.Toggle();
+            ///if (Input.GetKeyDown(KeyCode.Q)) QuickhackMenu.Toggle();
+            if (Input.GetKeyDown(CardsPlus.quickhackKey.Value)) QuickhackMenu.Toggle();
             if (Input.GetKeyDown(KeyCode.Escape)) QuickhackMenu.Hide();
         }
 

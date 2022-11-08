@@ -16,7 +16,8 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
             { QuickhackType.CONTAGION, 4 },
             { QuickhackType.SHORT_CIRCUIT, 1 },
             { QuickhackType.BURNOUT, 3 },
-            { QuickhackType.HAMPER, 2 }
+            { QuickhackType.HAMPER, 2 },
+            { QuickhackType.REBOOT_OPTICS, 3 } 
         };
 
         public enum QuickhackType
@@ -24,7 +25,8 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
             CONTAGION,
             SHORT_CIRCUIT,
             BURNOUT,
-            HAMPER
+            HAMPER,
+            REBOOT_OPTICS
         }
 
         public QuickhackType type;

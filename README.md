@@ -1,5 +1,5 @@
 # Cards Plus
-Adds 11 new cards to the game!
+Adds 20 new cards to the game!
 
 ## Card Stats
 - Hare
@@ -30,10 +30,66 @@ Adds 11 new cards to the game!
 	- Leave a trail of burning fire in your wake!
 - Smoke Grenade
 	- Fire a projectile that creates blinding smoke
+- Adware
+	- Press `F` to toggle "Hacker Mode". When clicking on an enemy while activated they will be assaulted by annoying popups!
+
+### Cyberpunk Class
+**Quickhacks**
+- Short Circuit
+	- **Quickhack**: Stun your target for 1 second
+- Hamper
+	- **Quickhack**: Half your target's movement for 5 seconds
+- Burnout
+	- **Quickhack**: Deal direct damage, more effective against targets with low health
+- Contagion
+	- **Quickhack**: Poison your target and anybody near them
+- Reboot Optics
+	- **Quickhack**: Blur your targets screen for 5 seconds
+
+**If any quickhack owned**
+- RAM Upgrade
+	- Adds 2 RAM
+- Overclock
+	- Increases RAM recharge rate by 63%
+
+**If all quickhacks owned**
+- Cyber Psychosis
+	- Significantly boost most stats
+	- Your chrome starts glitching when you take damage...
 
 # Patch Notes
 
-## 1.4.0
+### 1.8.6
+- Player now cannot fire when selecting a quickhack or a quickhack target
+- RAM Menu scale and visibility can now be configured from the CardsPlus mod menu (available in-game)
+
+### 1.8.4
+- Fixed maximum snake count not working in certain cases
+- Fixed snake health bars not reflecting the correct values for non-host clients
+
+### 1.8.0
+- Added Reboot Optics quickhack
+- Fixed Snake Attack snakes not moving properly
+- Fixed Phantom not applying on pickup
+- Fixed Hot Potato damage being multiplied by number of active players
+
+### 1.7.0
+- Implemented **Cyberpunk** class
+
+### 1.6.5
+- Implemented `ModsPlus` utilities
+
+### 1.6.0
+- Added "Quickhacks"
+    - Short Circuit
+    - Hamper
+    - Burnout
+    - Contagion
+
+### 1.5.0
+- Added Adware card
+
+### 1.4.0
 - Added Smoke Grenade card
 
 ### 1.3.1

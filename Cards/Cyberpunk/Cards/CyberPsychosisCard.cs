@@ -20,7 +20,6 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
             Art         = null,
             Rarity      = CardInfo.Rarity.Rare,
             Theme       = CardThemeColor.CardThemeColorType.EvilPurple,
-            OwnerOnly   = true,
             Stats = new[]
             {
                 new CardInfoStat()
@@ -70,7 +69,7 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
 
         public override void SetupCard(CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers)
         {
-            cardInfo.gameObject.AddComponent<CyberCardEffect>();
+            cardInfo.gameObject.GetOrAddComponent<CyberCardEffect>();
 
             cardInfo.allowMultiple = false;
 
@@ -105,6 +104,7 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
         protected override void Start()
         {
             base.Start();
+            if (!player.data.view.IsMine) return;
             glitchEffect = Camera.main.gameObject.AddComponent<Kino.DigitalGlitch>();
             glitchEffect.intensity = BASE_GLITCH_LEVEL;
         }
@@ -112,17 +112,18 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
         protected override void OnDestroy()
         {
             base.OnDestroy();
+            if (!player.data.view.IsMine) return;
             Destroy(glitchEffect);
         }
 
         public override void OnShoot(GameObject projectile)
         {
-            base.OnShoot(projectile);
             Instantiate(Assets.GlitchedParticleEffect, projectile.transform);
         }
 
         public override void OnTakeDamage(Vector2 damage, bool selfDamage)
         {
+            if (!player.data.view.IsMine) return;
             if (glitchCoroutine != null) Unbound.Instance.StopCoroutine(glitchCoroutine);
             glitchCoroutine = Unbound.Instance.StartCoroutine(DoGlitchEffect());
         }

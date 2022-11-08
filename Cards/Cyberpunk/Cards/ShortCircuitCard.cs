@@ -41,7 +41,7 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
             QuickhackMenu.RemoveQuickhack(QuickhackMenuOption.QuickhackType.SHORT_CIRCUIT);
         }
 
-        public static void DoQuickHack(Player target)
+        public static void DoQuickHack(Player target, Player source)
         {
             NetworkingManager.RPC(typeof(ShortCircuitCard), nameof(RPC_ApplyStun), target.playerID, 1f);
         }

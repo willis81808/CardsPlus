@@ -24,7 +24,7 @@ namespace CardsPlusPlugin
     [BepInDependency("pykess.rounds.plugins.moddingutils", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("com.willis.rounds.modsplus", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("root.classes.manager.reborn", BepInDependency.DependencyFlags.HardDependency)]
-    [BepInPlugin(ModId, ModName, "1.7.2")]
+    [BepInPlugin(ModId, ModName, "1.8.6")]
     [BepInProcess("Rounds.exe")]
     public class CardsPlus : BaseUnityPlugin
     {
@@ -35,6 +35,9 @@ namespace CardsPlusPlugin
         private const string CompatabilityModName = "CardsPlus";
 
         internal static ConfigEntry<bool> allowSelfTargeting;
+        internal static ConfigEntry<KeyCode> quickhackKey;
+        internal static ConfigEntry<float> ramMenuScale;
+        internal static ConfigEntry<bool> ramMenuVisible;
 
         void Awake()
         {
@@ -51,6 +54,15 @@ namespace CardsPlusPlugin
             GameModeManager.AddHook(GameModeHooks.HookPointStart, SetupPoint);
         }
 
+        void Start()
+        {
+            allowSelfTargeting = Config.Bind(CompatabilityModName, "CardsPlus_SelfTargeting", false, "Allow self-targeting with abilities using the player selector");
+            quickhackKey = Config.Bind(CompatabilityModName, "CardsPlus_QuickhackKey", KeyCode.Q, "Key binding for activating quickhack menu");
+            ramMenuScale = Config.Bind(CompatabilityModName, "CardsPlus_RamMenuScale", 1f, "Current scale of the RAM Menu");
+            ramMenuVisible = Config.Bind(CompatabilityModName, "CardsPlus_RamMenuVisible", true, "Determines if the RAM Menu will be displayed");
+            Unbound.RegisterMenu(ModName, null, SetupMenu, showInPauseMenu: true);
+        }
+
         private void OnAssetsLoaded()
         {
             LOGGER.LogInfo("ASSETS DONE LOADING, REGISTER CARDS");
@@ -58,15 +70,43 @@ namespace CardsPlusPlugin
             RegisterCards();
         }
 
-        void Start()
-        {
-            allowSelfTargeting = Config.Bind(CompatabilityModName, "CardsPlus_SelfTargeting", false, "Allow self-targeting with abilities using the player selector");
-            Unbound.RegisterMenu(ModName, null, SetupMenu, showInPauseMenu: true);
-        }
-
         private void SetupMenu(GameObject menu)
         {
+            MenuHandler.CreateText("Activate Quickhack Key", menu, out var text, 45, true);
+            MenuHandler.CreateText(quickhackKey.Value.ToString(), menu, out var qhKeyText, 60, true);
+            MenuHandler.CreateButton("Change Key", menu, () => StartChangeKeyBind(qhKeyText), 45, true);
+            MenuHandler.CreateText("   \n   ", menu, out var nothing, 60, true);
             MenuHandler.CreateToggle(allowSelfTargeting.Value, "Allow Self Targeting with Adware/Quickhacks", menu, val => allowSelfTargeting.Value = val, 30, true);
+            MenuHandler.CreateSlider("RAM Menu Scale", menu, 30, 0.2f, 1.2f, ramMenuScale.Value, val => ramMenuScale.Value = val, out UnityEngine.UI.Slider slider);
+            MenuHandler.CreateToggle(ramMenuVisible.Value, "RAM Menu Visible", menu, val => ramMenuVisible.Value = val, 30);
+        }
+
+        void StartChangeKeyBind(TMPro.TextMeshProUGUI text)
+        {
+            text.text = "Press any key to change the binding...";
+            StartCoroutine(GetNextKeyPress(key =>
+            {
+                text.text = key.ToString();
+                quickhackKey.Value = key;
+            }));
+        }
+
+        private IEnumerator GetNextKeyPress(Action<KeyCode> callback)
+        {
+            bool running = true;
+            while (running)
+            {
+                foreach (KeyCode keyCode in Enum.GetValues(typeof(KeyCode)))
+                {
+                    if (Input.GetKeyDown(keyCode))
+                    {
+                        running = false;
+                        callback?.Invoke(keyCode);
+                        break;
+                    }
+                }
+                yield return null;
+            }
         }
 
         private void RegisterPrefabs()
@@ -99,6 +139,10 @@ namespace CardsPlusPlugin
             CardRegistry.RegisterCard<RamUpgradeCard>();
             CardRegistry.RegisterCard<OverclockCard>();
             CardRegistry.RegisterCard<CyberPsychosisCard>();
+
+            CardRegistry.RegisterCard<RebootOpticsCard>();
+
+            //CardRegistry.RegisterCard<TestTurretCard>();
         }
 
         IEnumerator SetupPoint(IGameModeHandler gm)

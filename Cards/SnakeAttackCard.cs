@@ -9,6 +9,7 @@ using Photon.Pun;
 using UnboundLib;
 using UnboundLib.Cards;
 using UnboundLib.GameModes;
+using UnboundLib.Networking;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -49,17 +50,25 @@ namespace CardsPlusPlugin.Cards
 
         public override HasToReturn DoHitEffect(HitInfo hit)
         {
-            if (done || SnakeFollow.maxSnakeCount <= SnakeFollow.snakeCount)
+            if (done || SnakeFollow.maxSnakeCount <= SnakeFollow.snakeCount || (!PhotonNetwork.IsMasterClient && !PhotonNetwork.OfflineMode))
                 return HasToReturn.canContinue;
 
             if (hit.transform.GetComponentInParent<Player>() || hit.transform.GetComponentInParent<SnakeFollow>())
                 return HasToReturn.canContinue;
 
-            var result = PhotonNetwork.Instantiate(Assets.SnakePrefab.name, transform.position, Assets.SnakePrefab.transform.rotation).GetComponent<SnakeFollow>();
-            result.SetDamageScale(transform.lossyScale.x);
+            NetworkingManager.RPC(typeof(SnakeSpawner), nameof(RPC_SpawnSnake), transform.position, transform.lossyScale.x);
 
             done = true;
             return HasToReturn.canContinue;
+        }
+
+        [UnboundRPC]
+        public static void RPC_SpawnSnake(Vector3 position, float damageScale)
+        {
+            if (!PhotonNetwork.IsMasterClient && !PhotonNetwork.OfflineMode) return;
+
+            var snake = PhotonNetwork.Instantiate(Assets.SnakePrefab.name, position, Assets.SnakePrefab.transform.rotation, data: new object[] { Vector3.zero }).GetComponent<SnakeFollow>();
+            snake.SetDamageScale(damageScale);
         }
     }
     
@@ -67,7 +76,7 @@ namespace CardsPlusPlugin.Cards
     public class SnakeFollow : MonoBehaviour
     {
         internal static int snakeCount = 0;
-        internal static readonly int maxSnakeCount = 10;
+        internal static readonly int maxSnakeCount = 5;
 
         private Rigidbody2D rb;
         private PhotonView view;
@@ -83,6 +92,8 @@ namespace CardsPlusPlugin.Cards
         private float maxSpeed = 20;
         private float damageScale = 1f;
         private float maxHp = 75;
+
+        private bool ready = false;
         
         public Transform target;
 
@@ -107,7 +118,8 @@ namespace CardsPlusPlugin.Cards
         {
             // prevent collisions with all Background objects
             var backgroundObjects = GameObject.FindObjectsOfType<Collider2D>().Where(c => c.gameObject.layer == LayerMask.NameToLayer("BackgroundObject"));
-            foreach (var c in GetComponentsInChildren<Collider2D>())
+            var colliders = GetComponentsInChildren<Collider2D>();
+            foreach (var c in colliders)
             {
                 c.isTrigger = false;
 
@@ -115,7 +127,14 @@ namespace CardsPlusPlugin.Cards
                 {
                     Physics2D.IgnoreCollision(c, c2);
                 }
+                c.enabled = false;
             }
+
+            this.ExecuteAfterSeconds(0.5f, () =>
+            {
+                foreach (var c in colliders) c.enabled = true;
+                ready = true;
+            });
 
             // reset snake scale
             transform.localScale = Vector3.one;
@@ -123,21 +142,39 @@ namespace CardsPlusPlugin.Cards
             // destroy self when damaged too much
             damagable.currentHP = maxHp;
             damagable.maxHP = maxHp;
+
+            // setup health bar
+            customHealthBar.SetValues(damagable.currentHP, damagable.maxHP);
+
+            // only listen for damage events on the master client
+            if (!PhotonNetwork.IsMasterClient && !PhotonNetwork.OfflineMode) return;
+
             damagable.deathEvent = new UnityEvent();
             damagable.deathEvent.AddListener(OnDeath);
             damagable.damageEvent = new UnityEvent();
             damagable.damageEvent.AddListener(OnDamage);
 
-            // setup health bar
-            customHealthBar.SetValues(damagable.currentHP, damagable.maxHP);
         }
 
         private void OnDamage()
         {
-            customHealthBar.CurrentHealth = damagable.currentHP;
+            view.RPC(nameof(DoTakeDamge), RpcTarget.All, damagable.maxHP, damagable.currentHP);
+        }
+
+        [PunRPC]
+        private void DoTakeDamge(float maxHp, float currentHp)
+        {
+            customHealthBar.MaxHealth = maxHp;
+            customHealthBar.CurrentHealth = currentHp;
         }
 
         private void OnDeath()
+        {
+            view.RPC(nameof(DoDeath), RpcTarget.All);
+        }
+
+        [PunRPC]
+        private void DoDeath()
         {
             Sonigon.SoundManager.Instance.Play(PlayerManager.instance.players[0].data.healthHandler.soundDie, transform);
 
@@ -150,24 +187,12 @@ namespace CardsPlusPlugin.Cards
                 transform = transform
             }, Color.green);
 
-            Unbound.Instance.ExecuteAfterFrames(1, () => PhotonNetwork.Destroy(gameObject));
+            if (PhotonNetwork.IsMasterClient || PhotonNetwork.OfflineMode)
+                Unbound.Instance.ExecuteAfterFrames(1, () => PhotonNetwork.Destroy(gameObject));
         }
 
         private void Update()
         {
-            // follow nearest player
-            target = PlayerManager.instance.GetClosestPlayer(transform.position)?.transform;
-
-            // check if should deal damage
-            var nearby = Physics2D.OverlapCircleAll((Vector2)transform.position + rb.velocity.normalized * 0.4f, 1f, DamageLayerMask);
-            foreach (var t in nearby)
-            {
-                if (t.transform.CompareTag("Player"))
-                {
-                    DamageTarget(t.transform);
-                }
-            }
-
             if (PhotonNetwork.IsMasterClient || PhotonNetwork.OfflineMode)
             {
                 RandomizeMovement();
@@ -180,6 +205,21 @@ namespace CardsPlusPlugin.Cards
 
             // apply new velocity
             rb.velocity = Vector2.SmoothDamp(rb.velocity, velocity, ref velRef, smoothStrength);
+
+            // follow nearest player
+            target = PlayerManager.instance.GetClosestPlayer(transform.position)?.transform;
+
+            if (!ready) return;
+
+            // check if should deal damage
+            var nearby = Physics2D.OverlapCircleAll((Vector2)transform.position + rb.velocity.normalized * 0.4f, 1f, DamageLayerMask);
+            foreach (var t in nearby)
+            {
+                if (t.transform.CompareTag("Player"))
+                {
+                    DamageTarget(t.transform);
+                }
+            }
         }
 
         public void SetDamageScale(float scale)

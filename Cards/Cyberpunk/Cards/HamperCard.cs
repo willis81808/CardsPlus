@@ -43,7 +43,7 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
             QuickhackMenu.RemoveQuickhack(QuickhackMenuOption.QuickhackType.HAMPER);
         }
 
-        public static void DoQuickHack(Player target)
+        public static void DoQuickHack(Player target, Player source)
         {
             var delta = target.data.movement.force / 2;
             NetworkingManager.RPC(typeof(HamperCard), nameof(RPC_ApplySlow), target.playerID, delta);

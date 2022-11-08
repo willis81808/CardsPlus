@@ -18,7 +18,7 @@ namespace CardsPlusPlugin.Cards
         public override CardDetails Details => new CardDetails
         {
             Title       = "Smoke Grenade",
-            Description = "Your first bullet fired after locking releases a blinding smoke",
+            Description = "Your first bullet fired after blocking releases a blinding smoke",
             ModName     = "Cards+",
             Art         = Assets.SmokeGrenadeArt,
             Rarity      = CardInfo.Rarity.Common,

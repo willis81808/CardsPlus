@@ -10,7 +10,7 @@ using CardChoiceSpawnUniqueCardPatch.CustomCategories;
 
 namespace CardsPlusPlugin.Cards
 {
-    public class PhantomCard : CustomEffectCard<CardEffect>
+    public class PhantomCard : CustomEffectCard<PhantomEffect>
     {
         public override CardDetails Details => new CardDetails
         {
@@ -46,7 +46,7 @@ namespace CardsPlusPlugin.Cards
     {
         private float startTime = float.MaxValue;
 
-        public float duration = 0f;
+        public float duration = 3f;
 
         private bool active = false;
 
@@ -89,7 +89,7 @@ namespace CardsPlusPlugin.Cards
 
         public override void OnUpgradeCard()
         {
-            AddDuration(Math.Max(1f, duration));
+            AddDuration(3f);
         }
 
         void StartEffect()

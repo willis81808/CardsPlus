@@ -21,6 +21,9 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
 
         public static int AvailableRam => ramSlots.Where(r => r.Active).Count();
 
+        private CanvasGroup canvasGroup;
+        private Vector3 baseScale;
+
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -33,7 +36,22 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
         // Create starting RAM
         private void Start()
         {
+            baseScale = transform.localScale;
+            canvasGroup = GetComponent<CanvasGroup>();
             CreateRam(4);
+        }
+
+        private void Update()
+        {
+            transform.localScale = baseScale * CardsPlus.ramMenuScale.Value;
+            canvasGroup.alpha = CardsPlus.ramMenuVisible.Value ? 1 : 0;
+        }
+
+        private void OnDestroy()
+        {
+            RefillTime = BASE_REFILL_TIME;
+            Instance = null;
+            ramSlots.Clear();
         }
 
         public static void SetRefillTime(float time)
@@ -113,13 +131,6 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
             int newIndex = ramSlots.IndexOf(slot) + 1;
             if (newIndex >= ramSlots.Count) return;
             ramSlots[newIndex].StartRefill(OnFinishedRefilling, RefillTime, 0f);
-        }
-
-        private void OnDestroy()
-        {
-            RefillTime = BASE_REFILL_TIME;
-            Instance = null;
-            ramSlots.Clear();
         }
     }
 

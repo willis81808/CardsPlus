@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnboundLib.Cards;
 using UnityEngine;
+using UnboundLib;
 
 namespace CardsPlusPlugin.Cards
 {
@@ -33,11 +34,19 @@ namespace CardsPlusPlugin.Cards
     {
         private float spawnDelay = 0.1f;
         private float lifetime = 0.8f;
+        private Coroutine resetCoroutine;
 
         protected override void Start()
         {
             base.Start();
             InvokeRepeating(nameof(SpawnFlame), spawnDelay, spawnDelay);
+            resetCoroutine = Unbound.Instance.StartCoroutine(ClearFrameDamageTracking());
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            Unbound.Instance.StopCoroutine(resetCoroutine);
         }
 
         private void SpawnFlame()
@@ -46,12 +55,21 @@ namespace CardsPlusPlugin.Cards
             flameArea.GetComponent<HotPotatoFlame>().Init(player);
             Destroy(flameArea, lifetime);
         }
+
+        private IEnumerator ClearFrameDamageTracking()
+        {
+            while (true)
+            {
+                yield return new WaitForFixedUpdate();
+                HotPotatoFlame.effectedPlayers.Clear();
+            }
+        }
     }
 
     public class HotPotatoFlame : MonoBehaviour
     {
         public static readonly int RANGE = 1;
-        private static HashSet<Player> effectedPlayers = new HashSet<Player>();
+        internal static HashSet<Player> effectedPlayers = new HashSet<Player>();
 
         private Player owner;
         private float damage = 1;
@@ -63,6 +81,8 @@ namespace CardsPlusPlugin.Cards
 
         void FixedUpdate()
         {
+            if (!owner.data.view.IsMine) return;
+
             foreach (var obj in Physics2D.OverlapCircleAll(transform.position, RANGE))
             {
                 var player = obj.GetComponent<Player>();
@@ -75,7 +95,6 @@ namespace CardsPlusPlugin.Cards
                     player.data.healthHandler.CallTakeDamage(damageDir, player.transform.position, null, owner);
                 }
             }
-            effectedPlayers.Clear();
         }
     }
 }

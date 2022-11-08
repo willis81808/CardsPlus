@@ -69,7 +69,7 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
             {
                 var quickHackType = availableHacks[highlightedIndex].type;
 
-                ClearQuickhackSelectors();
+                ClearQuickhackSelectors(true);
 
                 if (CardsPlus.allowSelfTargeting.Value)
                 {
@@ -122,6 +122,21 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
             highlightedIndex = newIndex;
         }
 
+        private static void SilenceFiring(bool silenced)
+        {
+            if (silenced)
+            {
+                Instance.player.data.input.silencedInput = true;
+                return;
+            }
+
+            Unbound.Instance.ExecuteAfterSeconds(0.1f, () =>
+            {
+                if (Instance.player.data.silenceTime <= 0)
+                    Instance.player.data.input.silencedInput = false;
+            });
+        }
+
         public static void AddQuickhack(QuickhackMenuOption.QuickhackType type)
         {
             if (Instance == null) return;
@@ -144,14 +159,20 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
 
         public static void Toggle()
         {
-            if (Active) Hide();
-            else Show();
+            if (Active)
+            {
+                Hide();
+                SilenceFiring(false);
+            }
+            else
+            {
+                Show();
+            }
         }
 
         public static void Show()
         {
             Active = true;
-            Instance.player.data.input.silencedInput = true;
 
             int index = Instance.availableHacks.FindIndex(qh => QuickhackMenuOption.Costs[qh.type] <= RamMenu.AvailableRam);
             if (index < 0)
@@ -160,7 +181,7 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
                 return;
             }
 
-            ClearQuickhackSelectors();
+            ClearQuickhackSelectors(true);
 
             Instance.SetSelection(index);
             Instance.gameObject.SetActive(Active);
@@ -169,14 +190,15 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
         public static void Hide()
         {
             Active = false;
-            if (Instance.player.data.silenceTime == 0) Instance.player.data.input.silencedInput = false;
 
             Instance.horizontalMouseDelta = 0;
             Instance.gameObject.SetActive(Active);
         }
 
-        public static void ClearQuickhackSelectors()
+        public static void ClearQuickhackSelectors(bool silenced = false)
         {
+            SilenceFiring(silenced);
+
             foreach (QuickhackMenuOption.QuickhackType quickhackType in Enum.GetValues(typeof(QuickhackMenuOption.QuickhackType)))
             {
                 PlayerSelector.Clear(Assets.QuickhackSelectors[quickhackType]);
@@ -185,6 +207,8 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
 
         private static void OnPlayerSelected(Player target, QuickhackMenuOption.QuickhackType quickhackType)
         {
+            SilenceFiring(false);
+
             if (target.data.dead) return;
 
             if (!RamMenu.SpendRam(QuickhackMenuOption.Costs[quickhackType])) return;
@@ -194,16 +218,19 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
             switch (quickhackType)
             {
                 case QuickhackMenuOption.QuickhackType.CONTAGION:
-                    ContagionCard.DoQuickHack(target);
+                    ContagionCard.DoQuickHack(target, Instance.player);
                     break;
                 case QuickhackMenuOption.QuickhackType.SHORT_CIRCUIT:
-                    ShortCircuitCard.DoQuickHack(target);
+                    ShortCircuitCard.DoQuickHack(target, Instance.player);
                     break;
                 case QuickhackMenuOption.QuickhackType.BURNOUT:
-                    BurnoutCard.DoQuickHack(target);
+                    BurnoutCard.DoQuickHack(target, Instance.player);
                     break;
                 case QuickhackMenuOption.QuickhackType.HAMPER:
-                    HamperCard.DoQuickHack(target);
+                    HamperCard.DoQuickHack(target, Instance.player);
+                    break;
+                case QuickhackMenuOption.QuickhackType.REBOOT_OPTICS:
+                    RebootOpticsCard.DoQuickHack(target, Instance.player);
                     break;
             }
         }

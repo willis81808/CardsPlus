@@ -34,7 +34,7 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
 
         public override void SetupCard(CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers)
         {
-            cardInfo.gameObject.AddComponent<CyberCardEffect>();
+            cardInfo.gameObject.GetOrAddComponent<CyberCardEffect>();
         }
 
         protected override void Added(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)

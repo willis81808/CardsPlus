@@ -41,7 +41,7 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
             QuickhackMenu.RemoveQuickhack(QuickhackMenuOption.QuickhackType.BURNOUT);
         }
 
-        public static void DoQuickHack(Player target)
+        public static void DoQuickHack(Player target, Player source)
         {
             if (target.data.dead) return;
             var healthPercentage = target.data.health / target.data.maxHealth;
