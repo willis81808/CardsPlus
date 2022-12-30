@@ -59,6 +59,9 @@ Adds 20 new cards to the game!
 
 # Patch Notes
 
+### 1.8.7
+- Fixed bug where Excalibur swords could damage their owning player
+
 ### 1.8.6
 - Player now cannot fire when selecting a quickhack or a quickhack target
 - RAM Menu scale and visibility can now be configured from the CardsPlus mod menu (available in-game)

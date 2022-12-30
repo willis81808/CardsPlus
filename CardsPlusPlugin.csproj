@@ -142,6 +142,7 @@
     <Compile Include="Cards\Cyberpunk\UI\ScreenBlurEffect.cs" />
     <Compile Include="Cards\ExcaliburCard.cs" />
     <Compile Include="Cards\FragmentCard.cs" />
+    <Compile Include="Cards\TestCard.cs" />
     <Compile Include="Cards\HareCard.cs" />
     <Compile Include="Cards\HotPotato.cs" />
     <Compile Include="Cards\LowGravityCard.cs" />

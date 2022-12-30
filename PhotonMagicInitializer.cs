@@ -18,6 +18,17 @@ namespace CardsPlusPlugin
         public void OnPhotonInstantiate(PhotonMessageInfo info)
         {
             GetComponent<PhotonInitializedMonoBehaviour>().OnInstantiate(info.photonView.InstantiationData);
+
+            var s = new CardInfoStat[]
+            {
+                new CardInfoStat
+                {
+                    positive = true,
+                    stat = "Health",
+                    amount = "+20%",
+                    simepleAmount = CardInfoStat.SimpleAmount.notAssigned
+                }
+            };
         }
     }
 }

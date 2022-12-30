@@ -11,6 +11,7 @@ using UnboundLib;
 using CardsPlusPlugin.Utils;
 using ModsPlus;
 using ModdingUtils.AIMinion.Extensions;
+using System.Collections;
 
 namespace CardsPlusPlugin.Cards.Cyberpunk
 {
@@ -144,6 +145,14 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
             var prefab = Assets.QuickHacks[type];
             var menuOption = Instantiate(prefab, Instance.transform).GetComponent<QuickhackMenuOption>();
             Instance.availableHacks.Add(menuOption);
+        }
+
+        public IEnumerator Test(bool val)
+        {
+            if (val)
+            {
+                yield return null;
+            }
         }
 
         public static void RemoveQuickhack(QuickhackMenuOption.QuickhackType type)

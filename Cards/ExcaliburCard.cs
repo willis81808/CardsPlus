@@ -172,7 +172,7 @@ namespace CardsPlusPlugin.Cards
                 foreach (var r in results)
                 {
                     var player = r.GetComponent<Player>();
-                    if (player != null && player.transform != transform)
+                    if (player != null && player != this.player)
                         return player.transform;
                 }
 

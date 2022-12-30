@@ -47,6 +47,7 @@ namespace CardsPlusPlugin.Cards
         {
             base.OnDestroy();
             Unbound.Instance.StopCoroutine(resetCoroutine);
+            CancelInvoke(nameof(SpawnFlame));
         }
 
         private void SpawnFlame()

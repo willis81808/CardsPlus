@@ -30,7 +30,15 @@ namespace CardsPlusPlugin.Cards
 
         public override void SetupCard(CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers)
         {
+            var explosionToSpawn = Resources.Load<GameObject>("0 cards/Explosive Bullet").GetComponent<Gun>().objectsToSpawn[0];
+            gun.objectsToSpawn = new ObjectsToSpawn[] { explosionToSpawn };
             cardInfo.allowMultiple = false;
+        }
+
+        protected override void Added(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)
+        {
+            var cardsToRemove = player.data.currentCards.Where(c => c.cardName != cardInfo.cardName).ToArray();
+            base.Added(player, gun, gunAmmo, data, health, gravity, block, characterStats);
         }
     }
 
@@ -41,6 +49,12 @@ namespace CardsPlusPlugin.Cards
             var spawnedAttack = projectile.GetComponent<SpawnedAttack>();
             if (!spawnedAttack) return;
             projectile.AddComponent<SnakeSpawner>();
+        }
+
+        public override void OnTakeDamage(Vector2 damage, bool selfDamage)
+        {
+            
+            base.OnTakeDamage(damage, selfDamage);
         }
     }
 

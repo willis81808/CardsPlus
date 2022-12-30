@@ -36,6 +36,11 @@ namespace CardsPlusPlugin.Cards
     {
         private bool primed;
 
+        public override void OnUpgradeCard()
+        {
+            base.OnUpgradeCard();
+        }
+
         public override void OnShoot(GameObject projectile)
         {
             var spawnedAttack = projectile.GetComponent<SpawnedAttack>();
