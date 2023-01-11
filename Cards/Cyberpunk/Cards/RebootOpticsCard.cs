@@ -34,11 +34,13 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
         protected override void Added(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)
         {
             Unbound.Instance.ExecuteAfterFrames(1, () => QuickhackMenu.AddQuickhack(QuickhackMenuOption.QuickhackType.REBOOT_OPTICS));
+            CyberpunkClass.BuffDrawChance(3);
         }
 
         protected override void Removed(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats)
         {
             QuickhackMenu.RemoveQuickhack(QuickhackMenuOption.QuickhackType.REBOOT_OPTICS);
+            CyberpunkClass.BuffDrawChance(-3);
         }
 
         public static void DoQuickHack(Player target, Player source)

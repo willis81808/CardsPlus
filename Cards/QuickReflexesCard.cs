@@ -47,18 +47,6 @@ namespace CardsPlusPlugin.Cards
         // blank mono which just marks the player as being able to autoblock
     }
 
-    [HarmonyPatch(typeof(Block), "ResetStats")]
-    class BlockPatchResetStats
-    {
-        static void PostFix(Block __instance)
-        {
-            var quickReflexesEffect = __instance.GetComponent<QuickReflexesEffect>();
-            if (quickReflexesEffect != null)
-            {
-                GameObject.Destroy(quickReflexesEffect);
-            }
-        }
-    }
     [HarmonyPatch(typeof(ProjectileHit), "RPCA_DoHit")]
     [HarmonyPriority(Priority.First)]
     class ProjectileHitPatchRPCA_DoHit
@@ -90,7 +78,7 @@ namespace CardsPlusPlugin.Cards
             if (healthHandler && healthHandler.GetComponent<CharacterData>() && healthHandler.GetComponent<Block>())
             {
                 Block block = healthHandler.GetComponent<Block>();
-                if (healthHandler.GetComponent<QuickReflexesEffect>() != null && block.counter >= block.Cooldown())
+                if (healthHandler.GetComponentInChildren<QuickReflexesEffect>() != null && block.counter >= block.Cooldown())
                 {
                     wasBlocked = true;
                     var data = healthHandler.GetComponent<CharacterData>();

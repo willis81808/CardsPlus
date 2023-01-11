@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CardsPlusPlugin.Utils;
 using ClassesManagerReborn;
 using ModsPlus;
+using RarityLib.Utils;
 using UnboundLib.Cards;
 using UnityEngine;
 
@@ -14,6 +15,8 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
 {
     public class CyberpunkClass : ClassHandler
     {
+        private static CardInfo[] quickhacks;
+
         public override IEnumerator Init()
         {
             CardInfo
@@ -40,7 +43,7 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
             }
 
             // Register quickhacks as entrypoints with each other quickhack whitelisted
-            var quickhacks = new[] { shortCircuit, hamper, burnout, contagion, rebootOptics };
+            quickhacks = new[] { shortCircuit, hamper, burnout, contagion, rebootOptics };
             RegisterAndWhitelistAll(quickhacks);
 
             var oneOfAny = ArrayOfElementArrays(quickhacks);
@@ -48,6 +51,15 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
             ClassesRegistry.Register(overclock, CardType.Card, oneOfAny, 2);
 
             ClassesRegistry.Register(cyberPsychosis, CardType.Card, quickhacks);
+        }
+
+        internal static void BuffDrawChance(float multiplier)
+        {
+            foreach (var qh in quickhacks)
+            {
+                RarityUtils.AjustCardRarityModifier(qh, mul: multiplier);
+            }
+            RarityUtils.AjustCardRarityModifier(CardRegistry.GetCard<CyberPsychosisCard>(), mul: multiplier);
         }
 
         private void RegisterAndWhitelistAll(params CardInfo[] cards)

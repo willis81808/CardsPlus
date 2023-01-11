@@ -125,6 +125,8 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
 
         private static void SilenceFiring(bool silenced)
         {
+            if (Instance == null || Instance.player == null) return;
+
             if (silenced)
             {
                 Instance.player.data.input.silencedInput = true;

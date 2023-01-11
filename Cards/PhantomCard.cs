@@ -58,15 +58,14 @@ namespace CardsPlusPlugin.Cards
         private Collider2D[] colliders;
         private Color colorMin, colorMax;
 
-        void Awake()
-        {
-            playerColors = GetComponentsInChildren<SetTeamColor>();
-            particles = GetComponentsInChildren<PlayerSkinParticle>();
-            colliders = GetComponentsInChildren<Collider2D>();
-        }
         protected override void Start()
         {
             base.Start();
+
+            playerColors = player.GetComponentsInChildren<SetTeamColor>();
+            particles = player.GetComponentsInChildren<PlayerSkinParticle>();
+            colliders = player.GetComponentsInChildren<Collider2D>();
+
             projectileColor = player.data.weaponHandler.gun.projectileColor;
             damageOriginal = player.data.weaponHandler.gun.damage;
         }
