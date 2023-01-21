@@ -85,12 +85,13 @@ namespace CardsPlusPlugin.Cards.Cyberpunk
                 return;
             }
 
-            horizontalMouseDelta += mouseData.GetDelta().x;
-
-            if (Math.Abs(horizontalMouseDelta) >= mouseDeltaThreshold)
+            if (Input.mouseScrollDelta.y > 0)
             {
-                MoveSelection(horizontalMouseDelta < 0);
-                horizontalMouseDelta = 0;
+                MoveSelection(false);
+            }
+            else if (Input.mouseScrollDelta.y < 0)
+            {
+                MoveSelection(true);
             }
         }
 

@@ -52,7 +52,7 @@ namespace CardsPlusPlugin.Cards
 
         // player data backups
         private Color projectileColor;
-        private float damageOriginal;
+        private StatChangeTracker damageDebuff = null;
         private SetTeamColor[] playerColors;
         private PlayerSkinParticle[] particles;
         private Collider2D[] colliders;
@@ -67,7 +67,6 @@ namespace CardsPlusPlugin.Cards
             colliders = player.GetComponentsInChildren<Collider2D>();
 
             projectileColor = player.data.weaponHandler.gun.projectileColor;
-            damageOriginal = player.data.weaponHandler.gun.damage;
         }
 
         void Update()
@@ -102,7 +101,6 @@ namespace CardsPlusPlugin.Cards
             var p = player;
             var g = p.data.weaponHandler.gun;
             projectileColor = g.projectileColor;
-            damageOriginal = g.damage;
 
             colorMin = Color.white;
             colorMax = Color.white;
@@ -142,7 +140,7 @@ namespace CardsPlusPlugin.Cards
 
             g.ignoreWalls = true;
             g.projectileColor = Color.white;
-            g.damage = damageOriginal * 0.85f;
+            damageDebuff = StatManager.Apply(player, new StatChanges { Damage = 0.85f });
             
             foreach (var c in colliders)
             {
@@ -156,7 +154,8 @@ namespace CardsPlusPlugin.Cards
             var g = p.data.weaponHandler.gun;
             g.ignoreWalls = false;
             g.projectileColor = projectileColor;
-            g.damage = damageOriginal;
+            StatManager.Remove(damageDebuff);
+            damageDebuff = null;
 
             foreach (var c in colliders)
             {

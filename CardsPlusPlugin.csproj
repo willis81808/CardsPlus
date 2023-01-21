@@ -171,10 +171,8 @@
     <Compile Include="Utils\TrailPolygonCollider.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="AssetsEmbedded\cardsplusart" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="AssetsEmbedded\debugassets" />
+    <EmbeddedResource Include="AssetsEmbedded\cardsplusart" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
